@@ -25,7 +25,7 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Bad
 
-- Frozen on the laptop run alone (2026-11-13); the S24 run is still to be confirmed.
+- Frozen on the laptop run alone (2026-11-13); confirmed on the S24 by James, 2026-11-13.
 - v1/v2 health probes loaded the frozen v1 module of 14 layers and mostly checked that a function existed, so "all PASS" said nothing about the layers in use.
 - The Voice widget could never show a briefing from a real substrate: Weaver v1.0.0 cannot parse P9's ISO 8601 timestamps (the-weaver CHANGELOG). v0.1.1's note that the Weaver "works end-to-end against the real P9 database" was not true of the code.
 

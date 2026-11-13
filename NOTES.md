@@ -42,5 +42,5 @@ NOTES.md — open questions and decisions for The Legacy.
 - **Q4.** Authentication. Single-operator, localhost only. No auth
   in v1.0.0. If remote access becomes a requirement, that's a v2
   concern.
-- **Q5.** Freeze legacy_v3 (0.1.3)? **Resolved 2026-11-13 — James: "freeze all".** Frozen on the laptop run; the S24 run is still to be confirmed. Built and green on the laptop
+- **Q5.** Freeze legacy_v3 (0.1.3)? **Resolved 2026-11-13 — James: "freeze all".** Frozen on the laptop run; confirmed on the S24 by James, 2026-11-13. Built and green on the laptop
   (26/26). Not yet run on the S24. Raised 2026-11-13. Owner: James.
