@@ -44,7 +44,9 @@ NOTES.md — open questions and decisions for The Legacy.
   concern.
 - **Q5.** Freeze legacy_v3 (0.1.3)? **Resolved 2026-11-13 — James: "freeze all".** Frozen on the laptop run; confirmed on the S24 by James, 2026-11-13. Built and green on the laptop
   (26/26). Not yet run on the S24. Raised 2026-11-13. Owner: James.
-- **Q6.** Freeze legacy_v4 (The Projection) at 1.0.0? Built and green
+- **Q7.** Freeze legacy_v5 (The Projection redesigned)? **Resolved 2026-11-13 — James: "freeze".** Frozen on the laptop run; S24 run still to be confirmed. Built and green on
+  the laptop (38/38). Raised 2026-11-13. Owner: James.
+- **Q6.** Freeze legacy_v4 (The Projection) at 1.0.0? **Resolved 2026-11-13 — James: "freeze".** Frozen on the laptop run; S24 run still to be confirmed. Built and green
   on the laptop (33/33). The Field's rendering still to be checked in a
   real browser. Raised 2026-11-13. Owner: James.
 - **Q3 resolved 2026-11-13 (SPEC_V4):** the Field is embedded as an

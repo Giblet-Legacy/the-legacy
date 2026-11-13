@@ -6,4 +6,7 @@
 # 0.1.3 — v3 layer (legacy_v3.py: current-layer health, Weaver v1.1, /api/nerves).
 #         Tests pass (26/26).
 
-0.1.3
+# 1.0.0 — legacy_v4.py frozen: The Projection (SPEC_V4.md 1.1.0: one page, inbox drafts, the Voice).
+# 1.1.0 — legacy_v5.py frozen (SPEC_V5.md: the page redesigned, /api/claims, /api/chain). Tests pass (38/38).
+
+1.1.0

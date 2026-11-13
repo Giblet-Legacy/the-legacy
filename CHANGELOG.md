@@ -6,6 +6,37 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Good
 
+- (none)
+
+### Bad
+
+- (none)
+
+### Ugly
+
+- (none)
+
+## [v1.1.0] — 2026-11-13 — FROZEN
+
+### Good
+
+- `SPEC_V5.md`, `test_legacy_v5.py` (4 tests, run red first), `legacy_v5.py` and `static/projection_v5.html`: The Projection redesigned after James's "boring and uninspired" and "still not right try modern clean and technical": a clean technical console (status bar, metrics, layer grid, claims by face, Query for the Voice, Ledger and Claims tables, Field, New claim with the Echo result, Network, Briefing, LLLM). Two read-only routes, `/api/claims` and `/api/chain`. 38/38 pass (v1–v5).
+- Built as a layer: v4 (`legacy_v4.py`, `SPEC_V4.md`, `static/projection.html`) is exactly as committed and still served at `/static/projection.html`.
+- Frozen at 1.1.0 (James: "freeze", 2026-11-13).
+
+### Bad
+
+- Frozen on the laptop run alone (2026-11-13); the S24 run is still to be confirmed.
+- (none)
+
+### Ugly
+
+- The redesign was first written into v4's files in place. Undone before commit at James's request ("make sure you are not over writing and versioning like the claude.md requires") and rebuilt as v5.
+
+## [v1.0.0] — 2026-11-13 — FROZEN
+
+### Good
+
 - SPEC_V4 1.1.0 (before freeze): The Voice. `GET /api/voice?q=` runs a
   turn of LLLM (sibling `../lllm`), one session per server; the page
   gains a Voice panel (ask, reply, trace on request) and the Cockpit
@@ -15,30 +46,17 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 - The Legacy still never signs and never sees a passphrase. Its one write is a draft file in the Cockpit's inbox, guarded against cross-site requests (Host check, Origin check, required X-Forge-Legacy header, no preflight, JSON only, 8 KiB cap).
 - `escapeHtml` now escapes `'` (closes the v0.1.2 Ugly). The page adapts to light mode and narrow screens (checked in headless Edge at 1200 and 520 px).
 - Morning Briefing goes through Weaver v1.2; a regression test runs it from outside the repositories.
-- Built for James's "whole projection" request (2026-11-13). Not frozen (NOTES Q6).
+- Frozen at 1.0.0 (James: "freeze", 2026-11-13).
 
 ### Bad
 
+- Frozen on the laptop run alone (2026-11-13); the S24 run is still to be confirmed.
 - The 3D Field drew no cubes in headless Edge, even with software WebGL; its data was correct (5 claims, 1 attested). Needs a look in a real browser.
 - v3's /api/weaver (frozen) still uses Weaver v1.1 and fails when started outside a sibling repo. Run v4.
 
 ### Ugly
 
 - SPEC.md §3 ("GET and HEAD only") is narrowed for one route, deliberately: drafts only, no database or ledger writes.
-
-## [Unreleased]
-
-### Good
-
-- (none)
-
-### Bad
-
-- (none)
-
-### Ugly
-
-- (none)
 
 ## [v0.1.3] — 2026-11-13 — FROZEN
 
