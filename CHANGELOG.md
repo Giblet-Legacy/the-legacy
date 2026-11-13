@@ -16,6 +16,23 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 - (none)
 
+## [v1.2.0] — 2026-11-13 — FROZEN
+
+### Good
+
+- `SPEC_V6.md`, `test_legacy_v6.py` (4 tests, run red first), `legacy_v6.py` and `static/projection_v6.html`: the six fixes James agreed after seeing one multi-face cube per repo. Faces filled counts every filled face (69 on 24 cubes, not "FACT 24"); the Claims table has a Subject column and lists each cube's other faces; the Ledger has All / Claims / Seals / Proposals filters (`/api/chain?kind=`); suggestions ask "what is the <subject>?"; LLLM opinions moved under Claims; the Field hint names `serve_v3.py` (closes NOTES Q8 for v6). Claims and Ledger are full width. 42/42 pass.
+- Built as a layer: v5's files are exactly as committed (checked byte for byte); the v6 page started as a copy of v5's.
+- Frozen at 1.2.0 (James: "freeze", 2026-11-13).
+
+### Bad
+
+- Frozen on the laptop run alone (2026-11-13). v6 was not yet pushed when James
+  tested on the phone, so its S24 run is still to be confirmed.
+
+### Ugly
+
+- `/api/claims` reads the P9 claim list twice per request (v5's rows, then the faces). Fine at this size.
+
 ## [v1.1.0] — 2026-11-13 — FROZEN
 
 ### Good
@@ -26,7 +43,7 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Bad
 
-- Frozen on the laptop run alone (2026-11-13); the S24 run is still to be confirmed.
+- Frozen on the laptop run alone (2026-11-13); confirmed on the S24 by James, 2026-11-13.
 - (none)
 
 ### Ugly
@@ -50,7 +67,7 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Bad
 
-- Frozen on the laptop run alone (2026-11-13); the S24 run is still to be confirmed.
+- Frozen on the laptop run alone (2026-11-13); confirmed on the S24 by James, 2026-11-13.
 - The 3D Field drew no cubes in headless Edge, even with software WebGL; its data was correct (5 claims, 1 attested). Needs a look in a real browser.
 - v3's /api/weaver (frozen) still uses Weaver v1.1 and fails when started outside a sibling repo. Run v4.
 

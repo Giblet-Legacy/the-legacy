@@ -9,4 +9,6 @@
 # 1.0.0 — legacy_v4.py frozen: The Projection (SPEC_V4.md 1.1.0: one page, inbox drafts, the Voice).
 # 1.1.0 — legacy_v5.py frozen (SPEC_V5.md: the page redesigned, /api/claims, /api/chain). Tests pass (38/38).
 
-1.1.0
+# 1.2.0 — legacy_v6.py frozen (SPEC_V6.md: every filled face, ledger kind filter, Subject column, serve_v3 hints). Tests pass (42/42) on the laptop.
+
+1.2.0

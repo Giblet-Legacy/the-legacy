@@ -21,7 +21,7 @@ consumers. It does not rewrite them.
 - It is the **glue** — a web dashboard that surfaces all of them.
 
 ## Architecture
-- Entry point: `legacy_v5.py` (SPEC_V5.md, the redesigned page and /api/claims, /api/chain) over `legacy_v4.py` (SPEC_V4.md, The Projection: one page, the inbox draft is its only write) over `legacy_v3.py` (SPEC_V3.md) over `legacy_v2.py` over frozen `legacy.py`. Health comes from the Cockpit's `probe_layers`; the Morning Briefing from `weaver_v1_2`; the Voice (chat) from LLLM, `../lllm`; Nerves from SC-OS `nerves`.
+- Entry point: `legacy_v6.py` (SPEC_V6.md: every filled face, ledger kind filter, Subject column; frozen 1.2.0) over `legacy_v5.py` (SPEC_V5.md, the redesigned page and /api/claims, /api/chain) over `legacy_v4.py` (SPEC_V4.md, The Projection: one page, the inbox draft is its only write) over `legacy_v3.py` (SPEC_V3.md) over `legacy_v2.py` over frozen `legacy.py`. Health comes from the Cockpit's `probe_layers`; the Morning Briefing from `weaver_v1_2`; the Voice (chat) from LLLM, `../lllm`; Nerves from SC-OS `nerves`.
 - Python `http.server` (standard library only).
 - HTML/JS/CSS frontend (vanilla, no build step).
 - Calls other consumers via subprocess or direct SQLite read.

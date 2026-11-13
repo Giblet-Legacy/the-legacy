@@ -13,13 +13,13 @@ Tier:     Tier 1 — Consumer (The Connector)
 Depends:  All consumers (Cockpit, Substrate, Weaver, SC-OS, Echo)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
-Status:   1.1.0 — v1.0.0 The Projection (legacy_v4) and v1.1.0 its redesign
-          (legacy_v5), both frozen. See VERSION.
+Status:   1.2.0 — v1.0.0 The Projection (legacy_v4), v1.1.0 its redesign
+          (legacy_v5), v1.2.0 multi-face claims (legacy_v6); all frozen.
 
 ## Running
 
-    python legacy_v5.py [--host 127.0.0.1] [--port 8080]
-    python ../scp-substrate/serve_v2.py      # the 3D Field, embedded on the page
+    python legacy_v6.py [--host 127.0.0.1] [--port 8080]
+    python ../scp-substrate/serve_v3.py      # the 3D Field, embedded on the page
     python -m pytest -q
 
 `legacy.py` is the frozen v1 shell, `legacy_v2.py` the layer over it

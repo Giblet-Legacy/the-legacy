@@ -44,9 +44,9 @@ NOTES.md — open questions and decisions for The Legacy.
   concern.
 - **Q5.** Freeze legacy_v3 (0.1.3)? **Resolved 2026-11-13 — James: "freeze all".** Frozen on the laptop run; confirmed on the S24 by James, 2026-11-13. Built and green on the laptop
   (26/26). Not yet run on the S24. Raised 2026-11-13. Owner: James.
-- **Q7.** Freeze legacy_v5 (The Projection redesigned)? **Resolved 2026-11-13 — James: "freeze".** Frozen on the laptop run; S24 run still to be confirmed. Built and green on
+- **Q7.** Freeze legacy_v5 (The Projection redesigned)? **Resolved 2026-11-13 — James: "freeze".** Frozen on the laptop run; confirmed on the S24 by James, 2026-11-13. Built and green on
   the laptop (38/38). Raised 2026-11-13. Owner: James.
-- **Q6.** Freeze legacy_v4 (The Projection) at 1.0.0? **Resolved 2026-11-13 — James: "freeze".** Frozen on the laptop run; S24 run still to be confirmed. Built and green
+- **Q6.** Freeze legacy_v4 (The Projection) at 1.0.0? **Resolved 2026-11-13 — James: "freeze".** Frozen on the laptop run; confirmed on the S24 by James, 2026-11-13. Built and green
   on the laptop (33/33). The Field's rendering still to be checked in a
   real browser. Raised 2026-11-13. Owner: James.
 - **Q3 resolved 2026-11-13 (SPEC_V4):** the Field is embedded as an
@@ -56,3 +56,9 @@ NOTES.md — open questions and decisions for The Legacy.
   `serve_v2.py`. SCP Substrate's entry point is now `serve_v3.py`
   (v2 breaks the field on any attested claim). Frozen, so not edited:
   fix in the next Legacy version. Raised 2026-11-13. Owner: James.
+  **2026-11-13:** fixed in v6 (legacy_v6.py, projection_v6.html name
+  `serve_v3.py`); v4 and v5 keep the old hint, frozen.
+- **Q9.** Freeze legacy_v6 at 1.2.0? Built and green on the laptop (42/42).
+  Raised 2026-11-13. Owner: James.
+  **Resolved 2026-11-13 — James: "freeze".** Laptop run; S24 run still to be
+  confirmed (v6 was unpushed when the phone was tested).
