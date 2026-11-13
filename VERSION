@@ -3,4 +3,7 @@
 # 0.1.2 — v2 layer (legacy_v2.py: resilient health probes), test isolation.
 #         Tests pass (22/22).
 
-0.1.2
+# 0.1.3 — v3 layer (legacy_v3.py: current-layer health, Weaver v1.1, /api/nerves).
+#         Tests pass (26/26).
+
+0.1.3

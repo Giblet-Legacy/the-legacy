@@ -2,6 +2,37 @@
 
 CHANGELOG.md — build history for The Legacy, latest entry at top.
 
+## [Unreleased]
+
+### Good
+
+- (none)
+
+### Bad
+
+- (none)
+
+### Ugly
+
+- (none)
+
+## [v0.1.3] — 2026-11-13 — FROZEN
+
+### Good
+
+- `SPEC_V3.md`, `test_legacy_v3.py` (4 tests, run red first) and `legacy_v3.py`: /api/health now shows the Cockpit v1.1's own 15 round trips through the current layers (`forge_cli_v1_1.probe_layers`), so the dashboard and `forge health` cannot disagree; /api/weaver uses Weaver v1.1; new /api/nerves gives a verified, read-only view of SC-OS's pins (fails closed). 26/26 pass.
+- Built on James's delegation ("fix all 11 issues"). Frozen at 0.1.3 on James's sign-off ("freeze all", 2026-11-13).
+
+### Bad
+
+- Frozen on the laptop run alone (2026-11-13); the S24 run is still to be confirmed.
+- v1/v2 health probes loaded the frozen v1 module of 14 layers and mostly checked that a function existed, so "all PASS" said nothing about the layers in use.
+- The Voice widget could never show a briefing from a real substrate: Weaver v1.0.0 cannot parse P9's ISO 8601 timestamps (the-weaver CHANGELOG). v0.1.1's note that the Weaver "works end-to-end against the real P9 database" was not true of the code.
+
+### Ugly
+
+- The page has no Nerves widget yet; /api/nerves is ready for the v0.4.0 phase.
+
 ## [v0.1.2] — 2026-11-13 — v2 layer (resilient health probes)
 
 ### Good
