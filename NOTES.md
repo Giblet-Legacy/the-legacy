@@ -51,3 +51,8 @@ NOTES.md — open questions and decisions for The Legacy.
   real browser. Raised 2026-11-13. Owner: James.
 - **Q3 resolved 2026-11-13 (SPEC_V4):** the Field is embedded as an
   iframe of SCP Substrate on 8085; the Legacy probes its health first.
+- **Q8.** Stale hint in frozen files: legacy_v4.py, legacy_v5.py (startup
+  message) and static/projection_v5.html ("Field is not running") say
+  `serve_v2.py`. SCP Substrate's entry point is now `serve_v3.py`
+  (v2 breaks the field on any attested claim). Frozen, so not edited:
+  fix in the next Legacy version. Raised 2026-11-13. Owner: James.
