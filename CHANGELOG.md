@@ -6,6 +6,25 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Good
 
+- `SPEC_V4.md`, `test_legacy_v4.py` (7 tests, run red first), `legacy_v4.py` and `static/projection.html`: The Projection. One page with Health, the Morning Briefing, The Field (SCP Substrate embedded from 8085), The Cockpit (status), Remember (live Echo preview, then a draft for `forge inbox commit`), The Nerves and LLLM. Delivers the README's v0.2.0 Field, v0.3.0 Cockpit and v0.4.0 Nerves phases. 33/33 pass.
+- The Legacy still never signs and never sees a passphrase. Its one write is a draft file in the Cockpit's inbox, guarded against cross-site requests (Host check, Origin check, required X-Forge-Legacy header, no preflight, JSON only, 8 KiB cap).
+- `escapeHtml` now escapes `'` (closes the v0.1.2 Ugly). The page adapts to light mode and narrow screens (checked in headless Edge at 1200 and 520 px).
+- Morning Briefing goes through Weaver v1.2; a regression test runs it from outside the repositories.
+- Built for James's "whole projection" request (2026-11-13). Not frozen (NOTES Q6).
+
+### Bad
+
+- The 3D Field drew no cubes in headless Edge, even with software WebGL; its data was correct (5 claims, 1 attested). Needs a look in a real browser.
+- v3's /api/weaver (frozen) still uses Weaver v1.1 and fails when started outside a sibling repo. Run v4.
+
+### Ugly
+
+- SPEC.md §3 ("GET and HEAD only") is narrowed for one route, deliberately: drafts only, no database or ledger writes.
+
+## [Unreleased]
+
+### Good
+
 - (none)
 
 ### Bad

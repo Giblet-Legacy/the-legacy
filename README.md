@@ -17,7 +17,8 @@ Status:   0.1.3 (Phase 1, The Shell, on the current layers — see VERSION)
 
 ## Running
 
-    python legacy_v3.py [--host 127.0.0.1] [--port 8080]
+    python legacy_v4.py [--host 127.0.0.1] [--port 8080]
+    python ../scp-substrate/serve_v2.py      # the 3D Field, embedded on the page
     python -m pytest -q
 
 `legacy.py` is the frozen v1 shell, `legacy_v2.py` the layer over it

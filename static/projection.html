@@ -1,0 +1,286 @@
+<!doctype html>
+<!--
+  projection.html — The Legacy v4 page (The Projection, SPEC_V4.md §5).
+  Function: one window onto every consumer. Reads the JSON routes of
+  legacy_v4.py; its only write is "Save draft" (POST /api/inbox), which
+  the operator commits in the terminal with `forge inbox commit`.
+  Vanilla HTML/CSS/JS, no build step. Every interpolated value is escaped.
+  Licence: MSL-1.0. Author: James Gilbert (Giblets Forge).
+-->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Legacy</title>
+<style>
+  :root {
+    --bg: #14161b; --panel: #1e2128; --line: #2a2d34; --text: #eceded;
+    --muted: #8a8f99; --dim: #62666f; --accent: #5a95ee; --pass: #5fc26f;
+    --fail: #ee6f66; --warn: #e3b341;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f6f7f9; --panel: #ffffff; --line: #dfe2e7; --text: #1b1d22;
+      --muted: #5b616b; --dim: #868b94; --accent: #2f6fd6; --pass: #23863a;
+      --fail: #c8382f; --warn: #9a6b00;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif; background: var(--bg);
+    color: var(--text); margin: 0 auto; padding: 24px 16px 64px; max-width: 1100px;
+    line-height: 1.5;
+  }
+  h1 { font-weight: 600; margin: 0 0 4px; }
+  .subtitle { color: var(--dim); margin: 0 0 24px; font-size: 14px; }
+  h2 {
+    font-weight: 500; color: var(--muted); margin: 0 0 12px; font-size: 13px;
+    text-transform: uppercase; letter-spacing: 1.2px;
+  }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; min-width: 0; }
+  .wide { grid-column: 1 / -1; }
+  .row { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0;
+         border-bottom: 1px solid var(--line); font-size: 14px; }
+  .row:last-child { border-bottom: none; }
+  .row .k { color: var(--muted); flex-shrink: 0; max-width: 60%; }
+  .row .v { text-align: right; overflow-wrap: anywhere; min-width: 0; }
+  .pass { color: var(--pass); } .fail { color: var(--fail); } .warn { color: var(--warn); }
+  .muted { color: var(--dim); font-style: italic; } .error { color: var(--fail); }
+  .briefing { white-space: pre-wrap; font-size: 14px; border-left: 3px solid var(--accent); padding-left: 12px; }
+  .health { columns: 2 160px; font-size: 13px; }
+  .health div { break-inside: avoid; display: flex; justify-content: space-between; gap: 8px; }
+  iframe { width: 100%; height: 520px; border: 0; border-radius: 6px; background: #000; }
+  code { font-size: 12.5px; background: var(--bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  form { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+  label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+  .full { grid-column: 1 / -1; }
+  input, select, textarea {
+    font: inherit; font-size: 14px; color: var(--text); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px; padding: 8px; width: 100%;
+  }
+  textarea { min-height: 70px; resize: vertical; }
+  button {
+    font: inherit; font-size: 14px; cursor: pointer; border-radius: 6px; padding: 8px 14px;
+    border: 1px solid var(--accent); background: var(--accent); color: #fff;
+  }
+  button:disabled { opacity: .5; cursor: default; }
+  .preview { margin-top: 12px; font-size: 14px; }
+  .faces { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip { font-size: 12px; border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; color: var(--muted); }
+  @media (max-width: 560px) { form { grid-template-columns: 1fr; } .health { columns: 1; } iframe { height: 380px; } }
+</style>
+</head>
+<body>
+<h1>The Legacy</h1>
+<p class="subtitle">The projection of the self. Read-only, except drafts you commit yourself in the terminal.</p>
+
+<div class="grid">
+  <section class="card">
+    <h2>Health</h2>
+    <div id="health" class="health"><span class="muted">Loading&hellip;</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Morning Briefing</h2>
+    <div id="weaver"><span class="muted">Loading&hellip;</span></div>
+  </section>
+
+  <section class="card wide">
+    <h2>The Field</h2>
+    <div id="field"><span class="muted">Loading&hellip;</span></div>
+  </section>
+
+  <section class="card">
+    <h2>The Cockpit</h2>
+    <div id="cockpit"><span class="muted">Loading&hellip;</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Remember</h2>
+    <form id="remember" autocomplete="off">
+      <label>Subject<input name="subject" maxlength="200" required placeholder="sky"></label>
+      <label>Object<input name="object" maxlength="200" required placeholder="blue"></label>
+      <label class="full">Face
+        <select name="face">
+          <option>FACT</option><option>COUNTER</option><option>OPINION</option>
+          <option>FICTION</option><option>CONTEXT</option><option>UNKNOWN</option>
+        </select>
+      </label>
+      <label class="full">Text<textarea name="text" maxlength="2000" required placeholder="The sky is blue"></textarea></label>
+      <div class="full"><button type="submit" id="save" disabled>Save draft</button></div>
+    </form>
+    <div id="preview" class="preview"><span class="muted">Type a claim to see what the Echo says before you save it.</span></div>
+    <div id="inbox" class="preview"></div>
+  </section>
+
+  <section class="card">
+    <h2>The Nerves</h2>
+    <div id="nerves"><span class="muted">Loading&hellip;</span></div>
+  </section>
+
+  <section class="card">
+    <h2>LLLM</h2>
+    <div id="lllm"><span class="muted">Loading&hellip;</span></div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+  function $(id) { return document.getElementById(id); }
+  function row(k, v, cls) {
+    return '<div class="row"><span class="k">' + escapeHtml(k) + '</span><span class="v ' + (cls || "") + '">'
+         + escapeHtml(v) + "</span></div>";
+  }
+  function get(path) {
+    return fetch(path, { headers: { "Accept": "application/json" } }).then(function (r) { return r.json(); });
+  }
+  function fail(el, what) {
+    return function (err) { el.innerHTML = '<span class="error">' + escapeHtml(what + ": " + err) + "</span>"; };
+  }
+  function yesNo(v) { return v === true ? "yes" : v === false ? "no" : "n/a"; }
+  function cls(v) { return v === true ? "pass" : v === false ? "fail" : "muted"; }
+
+  // Health
+  get("/api/health").then(function (d) {
+    var html = "";
+    (d.layers || []).forEach(function (l) {
+      html += "<div><span>" + escapeHtml(l.layer) + '</span><span class="' + (l.status === "PASS" ? "pass" : "fail")
+            + '" title="' + escapeHtml(l.error || "") + '">' + escapeHtml(l.status) + "</span></div>";
+    });
+    $("health").innerHTML = html || '<span class="muted">No layers reported.</span>';
+  }).catch(fail($("health"), "Health check failed"));
+
+  // Morning Briefing
+  get("/api/weaver").then(function (d) {
+    if (d.briefing) {
+      $("weaver").innerHTML = '<div class="briefing">' + escapeHtml(d.briefing) + "</div>";
+    } else {
+      $("weaver").innerHTML = '<span class="muted">' + escapeHtml(d.error || "No briefing yet.") + "</span>";
+    }
+  }).catch(fail($("weaver"), "Weaver failed"));
+
+  // The Field
+  get("/api/field").then(function (d) {
+    if (d.reachable) {
+      $("field").innerHTML = '<iframe title="SCP Substrate field" src="' + escapeHtml(d.url) + '"></iframe>';
+    } else {
+      $("field").innerHTML = '<span class="muted">The 3D field is not running. Start it with </span>'
+        + "<code>python ../scp-substrate/serve_v2.py</code>"
+        + '<span class="muted"> (expected at ' + escapeHtml(d.url) + "), then reload.</span>";
+    }
+  }).catch(fail($("field"), "Field check failed"));
+
+  // The Cockpit
+  function loadCockpit() {
+    get("/api/cockpit").then(function (d) {
+      if (!d.available) { $("cockpit").innerHTML = '<span class="error">' + escapeHtml(d.error) + "</span>"; return; }
+      var s = d.status, c = s.claims, l = s.ledger, html = "";
+      html += row("Claims (active)", c.total);
+      html += row("Attested", c.attested);
+      html += row("Failed verification", c.unverified, c.unverified ? "fail" : "pass");
+      html += row("Ledger entries", l.entries);
+      html += row("Ledger self-consistent (P6)", yesNo(l.self_consistent), cls(l.self_consistent));
+      html += row("P8 mirror matches", yesNo(l.p8_mirror), cls(l.p8_mirror));
+      html += row("Open HAL proposals", s.pending_proposals);
+      html += row("Inbox: pending / done / refused", s.inbox.pending + " / " + s.inbox.done + " / " + s.inbox.refused);
+      html += '<div class="faces">';
+      Object.keys(c.by_face).forEach(function (f) {
+        html += '<span class="chip">' + escapeHtml(f) + " " + escapeHtml(c.by_face[f]) + "</span>";
+      });
+      $("cockpit").innerHTML = html + "</div>";
+    }).catch(fail($("cockpit"), "Cockpit status failed"));
+  }
+  loadCockpit();
+
+  // Remember: live Echo preview, then save a draft
+  var form = $("remember"), timer = null;
+  function fields() {
+    var f = new FormData(form);
+    return { subject: f.get("subject").trim(), object: f.get("object").trim(),
+             face: f.get("face"), text: f.get("text").trim() };
+  }
+  function renderEcho(e) {
+    if (e.error) { return '<span class="muted">' + escapeHtml(e.error) + "</span>"; }
+    var html = row("Keystone Gate", e.gate.passed ? "passes" : "refuses", e.gate.passed ? "pass" : "fail");
+    if (!e.gate.passed) { html += '<div class="error">' + escapeHtml(e.gate.reason) + "</div>"; }
+    html += row("Rules that would fire", e.rules_fired.length ? e.rules_fired.join(", ") : "none");
+    html += row("Open questions it answers", e.shape.resolves.length);
+    html += row("New questions it adds", e.shape.introduces);
+    return html;
+  }
+  function preview() {
+    var f = fields();
+    $("save").disabled = !(f.subject && f.object && f.text);
+    if (!f.subject || !f.object) { return; }
+    var q = new URLSearchParams({ subject: f.subject, object: f.object, face: f.face, text: f.text });
+    get("/api/echo?" + q.toString()).then(function (e) { $("preview").innerHTML = renderEcho(e); })
+      .catch(fail($("preview"), "Echo failed"));
+  }
+  form.addEventListener("input", function () { clearTimeout(timer); timer = setTimeout(preview, 300); });
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    $("save").disabled = true;
+    fetch("/api/inbox", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Forge-Legacy": "1" },
+      body: JSON.stringify(fields())
+    }).then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); })
+      .then(function (res) {
+        if (!res.ok) { $("preview").innerHTML = '<span class="error">' + escapeHtml(res.b.error) + "</span>"; return; }
+        $("preview").innerHTML = '<div class="pass">Draft ' + escapeHtml(res.b.draft_id) + " saved.</div>"
+          + renderEcho(res.b.echo);
+        form.reset();
+        loadInbox(); loadCockpit();
+      }).catch(fail($("preview"), "Save failed"))
+      .finally(function () { $("save").disabled = false; });
+  });
+
+  function loadInbox() {
+    get("/api/inbox").then(function (list) {
+      if (!Array.isArray(list) || !list.length) { $("inbox").innerHTML = ""; return; }
+      var html = "<h2>Waiting in the inbox</h2>";
+      list.forEach(function (d) {
+        html += d.invalid ? row(d.id, "invalid: " + d.invalid, "fail")
+                          : row(d.face, d.subject + " / " + d.object);
+      });
+      html += '<p class="muted">Commit in the terminal (your passphrase stays there):</p>'
+            + "<code>python forge_cli_v1_2.py inbox commit</code>";
+      $("inbox").innerHTML = html;
+    }).catch(fail($("inbox"), "Inbox failed"));
+  }
+  loadInbox();
+
+  // The Nerves
+  get("/api/nerves").then(function (d) {
+    if (d.error) { $("nerves").innerHTML = '<span class="error">' + escapeHtml(d.error) + "</span>"; return; }
+    if (!d.available) { $("nerves").innerHTML = '<span class="muted">No SC-OS pins yet. A node started with the stack pin path will appear here.</span>'; return; }
+    var n = d.nerves, html = row("This node", n.owner.slice(0, 24) + "…");
+    html += row("Owner checked against a trusted did", yesNo(n.owner_pinned), cls(n.owner_pinned));
+    html += row("Pinned peers", n.peer_count);
+    n.peers.forEach(function (p) { html += row("peer", p.slice(0, 24) + "…"); });
+    Object.keys(n.addresses).forEach(function (a) { html += row(a, n.addresses[a].slice(0, 24) + "…"); });
+    $("nerves").innerHTML = html;
+  }).catch(fail($("nerves"), "Nerves failed"));
+
+  // LLLM
+  get("/api/lllm").then(function (d) {
+    if (!d.available) { $("lllm").innerHTML = '<span class="muted">' + escapeHtml(d.error) + "</span>"; return; }
+    var html = row("Current build", d.build_id);
+    html += row("Anchored in the ledger", yesNo(d.anchored), d.anchored ? "pass" : "warn");
+    if (d.identity && d.identity.capsule_id) { html += row("Capsule", d.identity.capsule_id); }
+    (d.warnings || []).forEach(function (w) { html += '<div class="warn">' + escapeHtml(w) + "</div>"; });
+    if (!d.anchored) { html += '<p class="muted">Anchored automatically on the next dream, think or reason.</p>'; }
+    $("lllm").innerHTML = html;
+  }).catch(fail($("lllm"), "LLLM status failed"));
+})();
+</script>
+</body>
+</html>
