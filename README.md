@@ -13,7 +13,15 @@ Tier:     Tier 1 — Consumer (The Connector)
 Depends:  All consumers (Cockpit, Substrate, Weaver, SC-OS, Echo)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
-Status:   0.0.0-dev (in build, pre-freeze)
+Status:   0.1.2 (Phase 1, The Shell — see VERSION)
+
+## Running
+
+    python legacy_v2.py [--host 127.0.0.1] [--port 8080]
+    python -m pytest -q
+
+`legacy.py` is the frozen v1 shell. `legacy_v2.py` is the layer over
+it (see SPEC_V2.md) and is the one to run.
 
 ## What The Legacy shows
 

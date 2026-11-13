@@ -2,6 +2,36 @@
 
 CHANGELOG.md — build history for The Legacy, latest entry at top.
 
+## [v0.1.2] — 2026-11-13 — v2 layer (resilient health probes)
+
+### Good
+- `legacy_v2.py` added as a layer over the frozen `legacy.py`
+  (Immutable Rule: `legacy.py` is not edited). It re-composes v1's 15
+  probes from v1's own helpers so a missing `cryptography` yields FAIL
+  rows for P2/P3 (SPEC.md §2.1) instead of an `ImportError` and a 500
+  on `/api/health`. Everything else is inherited from v1.
+- `SPEC_V2.md` and `test_legacy_v2.py` (9 tests) added; one test pins
+  the v1 defect so the reason for v2 stays on record.
+- `test_legacy.py`: an autouse fixture resets the in-memory briefing
+  cache (a cached success could mask the error-path tests) and drops
+  `SSLKEYLOGFILE`, which made all 6 HTTP tests fail with
+  `PermissionError` when set to an unwritable path. Test-only; v1 code
+  untouched.
+- Docs aligned: README status and run instructions, NOTES Q1
+  (in-process probes, matching SPEC §4).
+- 22/22 pytest tests pass (13 v1 + 9 v2).
+
+### Bad
+- Run `python legacy_v2.py`, not `legacy.py`, to get the fix.
+
+### Ugly
+- Cache-busting for mobile browsers still outstanding (v0.2.0).
+- `legacy.py`'s header still reads "Version: 1.0.0 (on freeze;
+  0.0.0-dev until then)" and some v1 functions lack headers. Left
+  as-is because v1 is frozen.
+- `escapeHtml()` in `static/index.html` does not escape `'`. Harmless
+  today (data only lands in text nodes); deferred to v0.2.0 UI work.
+
 ## [v0.1.1] — 2026-11-13 — Phase 1 UI patch
 
 ### Good

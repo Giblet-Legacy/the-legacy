@@ -25,7 +25,9 @@ NOTES.md — open questions and decisions for The Legacy.
 - **Q1.** Health check depth. Should The Legacy run `forge health`
   as a subprocess (slow, ~2s, but isolated) or import `forge_cli`
   directly (fast, but couples The Legacy to the Cockpit's internals)?
-  v1.0.0 uses subprocess — isolation beats speed at the UI layer.
+  v0.1.x probes in-process (fast; see SPEC §4). Move to subprocess
+  if probes become slow or a broken layer can take the server down —
+  isolation beats speed at the UI layer.
 - **Q2.** Weaver freshness. Should the Weaver widget re-run
   `the-weaver` on every page load (fresh briefing, slow), or cache
   the last briefing and offer a "refresh" button? v1.0.0 runs on

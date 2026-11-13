@@ -38,8 +38,22 @@ for layer in [
 import legacy
 
 
+@pytest.fixture(autouse=True)
+def _isolate(monkeypatch):
+    """_isolate — reset the briefing cache and drop SSLKEYLOGFILE per test.
+
+    A cached successful briefing would mask the error-path tests, and an
+    unwritable SSLKEYLOGFILE (set by some IDEs/tools) makes urllib raise
+    PermissionError while building its default opener.
+    """
+    monkeypatch.setitem(legacy._BRIEFING_CACHE, "data", None)
+    monkeypatch.setitem(legacy._BRIEFING_CACHE, "ts", 0.0)
+    monkeypatch.delenv("SSLKEYLOGFILE", raising=False)
+
+
 @pytest.fixture
 def forge_home(tmp_path, monkeypatch):
+    """forge_home — point FORGE_HOME at an empty temp directory."""
     monkeypatch.setenv("FORGE_HOME", str(tmp_path))
     return tmp_path
 
