@@ -1,0 +1,6 @@
+# VERSION — the-legacy (Tier 1: The Legacy)
+# Function: the current release version of this consumer. Advances only on freeze.
+# 0.1.1 — Phase 1 UI patch (mobile flex fix, ISO timestamp integration tested).
+#         Tests pass (13/13).
+
+0.1.1

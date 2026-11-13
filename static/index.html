@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Legacy</title>
+<style>
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #14161b;
+    color: #eceded;
+    margin: 0;
+    padding: 24px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+  }
+  h1 { font-weight: 600; margin-bottom: 4px; }
+  h2 {
+    font-weight: 500;
+    color: #a0a5af;
+    margin-top: 32px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+  }
+  .subtitle { color: #62666f; margin-bottom: 24px; font-size: 14px; }
+  .layer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #2a2d34;
+    font-size: 14px;
+  }
+  .layer:last-child { border-bottom: none; }
+  .layer .name { flex: 1; }
+  .layer .status { margin-left: auto; font-weight: 500; }
+  .pass { color: #5fc26f; }
+  .fail { color: #ee6f66; }
+  .briefing {
+    background: #1e2128;
+    padding: 20px;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    font-size: 14px;
+    border-left: 3px solid #5a95ee;
+  }
+  .muted { color: #62666f; font-style: italic; }
+  .error { color: #ee6f66; }
+</style>
+</head>
+<body>
+<h1>The Legacy</h1>
+<p class="subtitle">The projection of the self.</p>
+
+<h2>Health</h2>
+<div id="health"><span class="muted">Loading&hellip;</span></div>
+
+<h2>Morning Briefing</h2>
+<div id="weaver" class="briefing"><span class="muted">Loading&hellip;</span></div>
+
+<script>
+(function () {
+  var healthEl = document.getElementById("health");
+  var weaverEl = document.getElementById("weaver");
+
+  fetch("/api/health")
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      var layers = (data && data.layers) || [];
+      if (layers.length === 0) {
+        healthEl.innerHTML = '<span class="muted">No layers reported.</span>';
+        return;
+      }
+      var html = "";
+      for (var i = 0; i < layers.length; i++) {
+        var l = layers[i];
+        var cls = l.status === "PASS" ? "pass" : "fail";
+        html += '<div class="layer">'
+              + '<span class="name">' + escapeHtml(l.layer) + '</span>'
+              + '<span class="status ' + cls + '">' + escapeHtml(l.status) + '</span>'
+              + '</div>';
+      }
+      healthEl.innerHTML = html;
+    })
+    .catch(function (err) {
+      healthEl.innerHTML = '<span class="error">Health check failed: ' + escapeHtml(String(err)) + '</span>';
+    });
+
+  fetch("/api/weaver")
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (data && data.briefing) {
+        weaverEl.textContent = data.briefing;
+      } else if (data && data.error) {
+        weaverEl.innerHTML = '<span class="error">Briefing unavailable: ' + escapeHtml(data.error) + '</span>';
+      } else {
+        weaverEl.innerHTML = '<span class="muted">No briefing yet.</span>';
+      }
+    })
+    .catch(function (err) {
+      weaverEl.innerHTML = '<span class="error">Weaver failed: ' + escapeHtml(String(err)) + '</span>';
+    });
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+})();
+</script>
+</body>
+</html>

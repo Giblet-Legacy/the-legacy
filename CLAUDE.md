@@ -1,0 +1,33 @@
+# Forge Stack Context — The Legacy
+
+CLAUDE.md — Context briefing for AI assistants working in this repository.
+
+## What this repo is
+The final consumer. Tier 1. The master orchestrator. It is the
+projection of the self — a unified dashboard that surfaces the
+outputs of every other consumer (Cockpit, Substrate, Weaver, SC-OS,
+Echo) in one place. It is the operator's window into The Legacy.
+
+## The Immutable Rule
+Never rewrite a primitive. Add a layer. The Legacy consumes other
+consumers. It does not rewrite them.
+
+## What it is NOT
+- Not a replacement for `explorer-d334-forge` (the CLI).
+- Not a replacement for `scp-substrate` (the 3D viewer).
+- Not a replacement for `the-weaver` (the morning voice).
+- Not a replacement for `sc-os` (the network).
+- Not a replacement for `the-echo` (the mirror).
+- It is the **glue** — a web dashboard that surfaces all of them.
+
+## Architecture
+- Python `http.server` (standard library only).
+- HTML/JS/CSS frontend (vanilla, no build step).
+- Calls other consumers via subprocess or direct SQLite read.
+- Read-mostly. All writes still route through the Cockpit.
+
+## Constraints
+- Standard library only (except `pytest` for dev).
+- British English (-ise, artefact).
+- Header discipline on every file and function.
+- LF-only. No CRLF.
