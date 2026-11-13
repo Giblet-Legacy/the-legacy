@@ -6,6 +6,11 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Good
 
+- SPEC_V4 1.1.0 (before freeze): The Voice. `GET /api/voice?q=` runs a
+  turn of LLLM (sibling `../lllm`), one session per server; the page
+  gains a Voice panel (ask, reply, trace on request) and the Cockpit
+  panel counts LLLM opinions. James: "lllm commands go via the
+  legacy". 34/34 pass.
 - `SPEC_V4.md`, `test_legacy_v4.py` (7 tests, run red first), `legacy_v4.py` and `static/projection.html`: The Projection. One page with Health, the Morning Briefing, The Field (SCP Substrate embedded from 8085), The Cockpit (status), Remember (live Echo preview, then a draft for `forge inbox commit`), The Nerves and LLLM. Delivers the README's v0.2.0 Field, v0.3.0 Cockpit and v0.4.0 Nerves phases. 33/33 pass.
 - The Legacy still never signs and never sees a passphrase. Its one write is a draft file in the Cockpit's inbox, guarded against cross-site requests (Host check, Origin check, required X-Forge-Legacy header, no preflight, JSON only, 8 KiB cap).
 - `escapeHtml` now escapes `'` (closes the v0.1.2 Ugly). The page adapts to light mode and narrow screens (checked in headless Edge at 1200 and 520 px).

@@ -68,6 +68,14 @@
   .preview { margin-top: 12px; font-size: 14px; }
   .faces { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .chip { font-size: 12px; border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; color: var(--muted); }
+  .voice-form { grid-template-columns: 1fr auto; align-items: end; }
+  .turn { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .turn:last-child { border-bottom: none; }
+  .turn .you { color: var(--muted); }
+  .turn .said { margin-top: 2px; overflow-wrap: anywhere; }
+  details pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; background: var(--bg);
+                padding: 8px; border-radius: 6px; margin: 6px 0 0; }
+  summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
   @media (max-width: 560px) { form { grid-template-columns: 1fr; } .health { columns: 1; } iframe { height: 380px; } }
 </style>
 </head>
@@ -84,6 +92,19 @@
   <section class="card">
     <h2>Morning Briefing</h2>
     <div id="weaver"><span class="muted">Loading&hellip;</span></div>
+  </section>
+
+  <section class="card wide">
+    <h2>The Voice</h2>
+    <form id="voice" autocomplete="off" class="voice-form">
+      <label class="full">Ask about what you have remembered
+        <input name="q" maxlength="2000" required placeholder="is the sky blue?">
+      </label>
+      <div><button type="submit">Ask</button></div>
+    </form>
+    <div id="voice-log" class="preview" aria-live="polite">
+      <span class="muted">It answers only from your FACT, COUNTER and CONTEXT claims, cites them, and says when it does not know. Try "how did you work that out?" after an answer.</span>
+    </div>
   </section>
 
   <section class="card wide">
@@ -189,6 +210,7 @@
       html += row("Ledger entries", l.entries);
       html += row("Ledger self-consistent (P6)", yesNo(l.self_consistent), cls(l.self_consistent));
       html += row("P8 mirror matches", yesNo(l.p8_mirror), cls(l.p8_mirror));
+      html += row("LLLM opinions (lllm.db)", s.lllm_opinions === undefined ? "n/a" : s.lllm_opinions);
       html += row("Open HAL proposals", s.pending_proposals);
       html += row("Inbox: pending / done / refused", s.inbox.pending + " / " + s.inbox.done + " / " + s.inbox.refused);
       html += '<div class="faces">';
@@ -257,6 +279,25 @@
     }).catch(fail($("inbox"), "Inbox failed"));
   }
   loadInbox();
+
+  // The Voice: one turn per question; newest turn first, trace on request
+  var voiceForm = $("voice"), voiceLog = $("voice-log"), voiceStarted = false;
+  voiceForm.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var q = new FormData(voiceForm).get("q").trim();
+    if (!q) { return; }
+    get("/api/voice?" + new URLSearchParams({ q: q }).toString()).then(function (d) {
+      var said = d.available ? escapeHtml(d.reply) : '<span class="error">' + escapeHtml(d.error || "The Voice is unavailable.") + "</span>";
+      var html = '<div class="turn"><div class="you">You: ' + escapeHtml(q) + '</div><div class="said">' + said + "</div>";
+      if (d.trace_text) {
+        html += "<details><summary>Show trace (" + escapeHtml(d.trace.plan) + ")</summary><pre>"
+              + escapeHtml(d.trace_text) + "</pre></details>";
+      }
+      voiceLog.innerHTML = html + "</div>" + (voiceStarted ? voiceLog.innerHTML : "");
+      voiceStarted = true;
+      voiceForm.reset();
+    }).catch(fail(voiceLog, "The Voice failed"));
+  });
 
   // The Nerves
   get("/api/nerves").then(function (d) {

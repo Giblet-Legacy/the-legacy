@@ -14,6 +14,7 @@ Functions in this file (pytest-collected):
     5. test_inbox_guards
     6. test_page
     10. test_briefing_from_any_directory
+    11. test_voice
 
 Fixtures and helpers:
     7.  home    — FORGE_HOME with key.pem and two claims written by the Cockpit
@@ -188,7 +189,8 @@ def test_page(legacy):
     base, _ = legacy
     status, html = _req(base + "/")
     assert status == 200
-    for section in ("Health", "Morning Briefing", "The Field", "The Cockpit", "Remember", "The Nerves", "LLLM"):
+    for section in ("Health", "Morning Briefing", "The Field", "The Cockpit", "Remember", "The Nerves", "LLLM",
+                    "The Voice"):
         assert section in html, section
     assert "X-Forge-Legacy" in html and "&#39;" in html
     assert _req(base + "/static/index.html")[0] == 200
@@ -213,3 +215,19 @@ def test_briefing_from_any_directory(home, tmp_path):
     r = subprocess.run([sys.executable, "-c", code], cwd=str(work), capture_output=True, text=True, env=env, timeout=120)
     assert r.returncode == 0, r.stderr
     assert r.stdout.strip() == "None Morning. 1"
+
+
+# 11. test_voice
+def test_voice(legacy, home):
+    base, _ = legacy
+    q = urllib.parse.urlencode({"q": "is the sky blue?"})
+    status, body = _req(base + "/api/voice?" + q)
+    assert status == 200 and body["available"] is True
+    assert body["reply"].startswith("Yes. sky is blue. [") and body["trace"]["plan"] == "answer"
+    assert "--- trace ---" in body["trace_text"]
+    body = _req(base + "/api/voice?" + urllib.parse.urlencode({"q": "how did you work that out?"}))[1]
+    assert body["trace"]["plan"] == "trace" and "plan answer" in body["reply"]
+    body = _req(base + "/api/voice?" + urllib.parse.urlencode({"q": "is the tide late?"}))[1]
+    assert body["trace"]["plan"] == "unknown"  # an UNKNOWN claim has no polarity: never spoken as fact
+    assert _req(base + "/api/voice")[0] == 400
+    assert _req(base + "/api/voice?" + urllib.parse.urlencode({"q": "x" * 2001}))[0] == 400

@@ -15,7 +15,7 @@ Depends:  forge_cli_v1_2 (Cockpit: status, drafts, LLLM provenance),
           weaver_v1_2 (Weaver),
           echo_v1_1 (Echo), serve_v2 at 127.0.0.1:8085 (SCP Substrate),
           weaver_v1_1, sc-os nerves (via legacy_v3)
-Version:  SPEC_V4 1.0.0
+Version:  SPEC_V4 1.1.0
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
 
@@ -43,6 +43,18 @@ Author:   James Gilbert (Giblets Forge)
 | `/api/echo?subject=&object=&face=[&text=]` | Echo v1.1 preview: `{gate, rules_fired, shape, memory}`; 400 on missing or invalid fields; `{error}` if there is no substrate yet |
 | `/api/inbox` | pending drafts, each `{id, subject, object, face, text}` or `{id, invalid}` |
 | `/` | `static/projection.html` (the v1 page stays at `/static/index.html`) |
+
+### 2a. The Voice (SPEC_V4 1.1.0)
+
+`GET /api/voice?q=<text>` (1–2000 characters, else 400) runs one turn
+of LLLM, the Voice (`Giblet-Legacy/lllm`, sibling `../lllm`), and
+answers `{available, reply, trace, trace_text, error}`. One session
+per server (single operator), held under a lock, so "how did you work
+that out?" explains the previous turn. The Voice reads `forge.db`
+only, read-only (LLLM SPEC §12), and answers only from claims with a
+polarity, which the Cockpit writes for FACT, COUNTER and CONTEXT. A
+turn changes nothing on disk, so it is a GET. James, 2026-11-13:
+"lllm commands go via the legacy" (LLLM NOTES Q6).
 
 Every read route answers 200 with an `error` field rather than failing
 when a consumer is missing; a missing consumer never takes the page
@@ -77,7 +89,8 @@ Sections, each filled from §2: Health · Morning Briefing · The Field
 (claims by face, attested, ledger entries, self-consistency, P8
 mirror, open proposals, inbox counts) · Remember (form → live Echo
 preview → "Save draft" → `forge inbox commit` in the terminal) · The
-Nerves (owner, peers) · LLLM (build, anchored, warnings). Escaping:
+Nerves (owner, peers) · LLLM (build, anchored, warnings) · The Voice
+(ask, reply, trace on request; newest turn first). Escaping:
 every interpolated value goes through `escapeHtml`, which also escapes
 `'` (closing the v0.1.1 CHANGELOG "Ugly"). Colours follow the v1 page
 and adapt to light mode.
@@ -92,6 +105,9 @@ and adapt to light mode.
   foreign Origin → 403; wrong content type → 415; oversize → 413;
   invalid face → 400; OPTIONS/PUT → 405.
 - A draft saved through the Legacy is committed by `forge inbox commit`.
+- `/api/voice` answers from a FACT the Cockpit wrote, explains itself on
+  the next turn, refuses an UNKNOWN claim, and rejects an empty or
+  oversize question.
 - `/` serves the Projection page with every section.
 - Started from a directory outside the repositories, the Legacy still
   produces a Morning Briefing (regression for the Weaver import defect).
@@ -104,3 +120,4 @@ and adapt to light mode.
   projection" request. The inbox write is a deliberate, narrow change
   to SPEC.md §3 ("GET and HEAD only"): drafts only, no signing, no
   database or ledger writes.
+- **SPEC_V4 1.1.0** — 2026-11-13, before freeze: §2a The Voice.

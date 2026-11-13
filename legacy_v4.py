@@ -6,7 +6,8 @@ Function:
     One page through which the operator sees and feeds every consumer:
     health, the Weaver's briefing, the 3D Field (SCP Substrate), the
     Cockpit's status, a Remember form with a live Echo preview, the
-    Nerves (SC-OS) and LLLM's build (SPEC_V4.md). Its only write is a
+    Nerves (SC-OS), LLLM's build, and the Voice: questions answered
+    from your claims by LLLM, with a trace (SPEC_V4.md). Its only write is a
     draft in the Cockpit's inbox; it never signs and never sees a
     passphrase. legacy.py, legacy_v2.py and legacy_v3.py are not edited.
 
@@ -17,6 +18,7 @@ Public API:
     4. echo_preview(fields) -> dict
     5. pending_drafts() -> list
     12. get_briefing() -> dict   (Weaver v1.2)
+    14. voice_turn(text) -> dict (LLLM, the Voice)
     6. make_server(host, port)
     7. main(argv) -> int
 
@@ -28,8 +30,8 @@ Internal helpers (numbered below):
     13. _weaver   — Weaver v1.2 module (imports from any working directory)
 
 Tier:     Tier 1 — Consumer (The Connector)
-Depends:  forge_cli_v1_2, echo_v1_1, weaver_v1_2, SCP Substrate serve_v2 (HTTP), legacy_v3
-Spec:     SPEC_V4.md 1.0.0 (over SPEC_V3.md, SPEC_V2.md, SPEC.md)
+Depends:  forge_cli_v1_2, echo_v1_1, weaver_v1_2, lllm (the Voice), SCP Substrate serve_v2 (HTTP), legacy_v3
+Spec:     SPEC_V4.md 1.1.0 (over SPEC_V3.md, SPEC_V2.md, SPEC.md)
 Version:  1.0.0 (The Projection; on James's sign-off)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
@@ -38,6 +40,7 @@ Author:   James Gilbert (Giblets Forge)
 import json
 import os
 import sys
+import threading
 import urllib.error
 import urllib.request
 from http.server import ThreadingHTTPServer
@@ -54,6 +57,30 @@ DEFAULT_FIELD_URL = "http://127.0.0.1:8085/"
 MAX_BODY = 8192
 _FACES = ("FACT", "COUNTER", "OPINION", "FICTION", "CONTEXT", "UNKNOWN")
 _BRIEFING_CACHE = {"ts": 0.0, "data": None}
+_VOICE = {"session": None, "lock": threading.Lock()}
+MAX_VOICE_INPUT = 2000
+
+
+# ---------------------------------------------------------------------------
+# 14. voice_turn
+#     SPEC_V4 §2a: one LLLM Voice session per server (single operator), so
+#     "how did you work that out?" refers to the previous turn. The Voice
+#     reads forge.db only, read-only; LLLM's own opinions (lllm.db) are
+#     not spoken as fact.
+# ---------------------------------------------------------------------------
+def voice_turn(text):
+    try:
+        voice = legacy_v3._sibling("lllm", "lllm")
+    except Exception as e:
+        return {"available": False, "reply": None, "trace": None, "trace_text": None,
+                "error": f"the Voice is not installed: {e}"}
+    with _VOICE["lock"]:
+        db = legacy._db_path()
+        if _VOICE["session"] is None or _VOICE["session"].db_path != db:
+            _VOICE["session"] = voice.Session(db)
+        reply, trace = _VOICE["session"].turn(text)
+    return {"available": True, "reply": reply, "trace": trace,
+            "trace_text": voice.format_trace(trace), "error": None}
 
 
 # ---------------------------------------------------------------------------
@@ -226,6 +253,11 @@ class _LegacyV4Handler(legacy_v3._LegacyV3Handler):
             return self._serve_static("projection.html")
         if path == "/api/weaver":
             return self._send(200, get_briefing())
+        if path == "/api/voice":
+            q = parse_qs(parts.query).get("q", [""])[0].strip()
+            if not q or len(q) > MAX_VOICE_INPUT:
+                return self._send(400, {"error": f"q must be 1–{MAX_VOICE_INPUT} characters"})
+            return self._send(200, voice_turn(q))
         if path == "/api/cockpit":
             return self._send(200, cockpit_status())
         if path == "/api/lllm":
