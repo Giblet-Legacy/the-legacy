@@ -16,6 +16,32 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 - (none)
 
+## [v1.3.0] — 2026-11-13 — FROZEN
+
+### Good
+
+- `SPEC_V7.md`, `test_legacy_v7.py` (4 tests, run red first),
+  `legacy_v7.py` and `static/projection_v7.html`: the LLLM wired through.
+  The Voice panel uses LLLM v0.1.2 (a claim's signed text; a subject's
+  aspects one per line), the Morning Briefing uses Weaver v1.3 (present
+  whenever there are UNKNOWN claims, engine or not), and `/api/lllm`
+  and `/api/cockpit` use Cockpit v1.3 (engine via LLLM_CLI or PATH).
+  Hints name forge_cli_v1_3 and serve_v4.
+- 46/46 pass. legacy.py and v2-v6 untouched. Built on James's
+  delegation ("make sure [the LLLM] is properly wired in"). Frozen at 1.3.0 (James: "freeze commmit and push", 2026-11-13); laptop run, S24 run
+  still to be confirmed.
+
+### Bad
+
+- v7 depends on four layers built the same day: Cockpit v1.3, Weaver
+  v1.3, LLLM v0.1.2 and (for the hint) SCP Substrate v4; all frozen with
+  it, on the laptop run only.
+
+### Ugly
+
+- projection_v7.html is a copy of v6's page with three changes, so the
+  page is not shared between versions.
+
 ## [v1.2.0] — 2026-11-13 — FROZEN
 
 ### Good

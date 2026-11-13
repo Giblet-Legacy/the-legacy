@@ -62,3 +62,7 @@ NOTES.md — open questions and decisions for The Legacy.
   Raised 2026-11-13. Owner: James.
   **Resolved 2026-11-13 — James: "freeze".** Laptop run; S24 run still to be
   confirmed (v6 was unpushed when the phone was tested).
+- **Q10.** Freeze legacy_v7 at 1.3.0? The LLLM wired through (SPEC_V7.md).
+  Built and green on the laptop (46/46). Waits on Cockpit v1.3, Weaver v1.3
+  and LLLM v0.1.2. Raised 2026-11-13. Owner: James.
+  **Resolved 2026-11-13 — James: "freeze commmit and push".** Frozen on the laptop run; S24 run still to be confirmed.
