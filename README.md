@@ -19,6 +19,7 @@ Status:   1.3.0 — v1.0.0 The Projection (legacy_v4), v1.1.0 its redesign
 
 ## Running
 
+    python boot.py                           # the Field, then The Legacy (v8), kept running
     python legacy_v7.py [--host 127.0.0.1] [--port 8080]
     python ../scp-substrate/serve_v4.py      # the 3D Field, embedded on the page
     # LLLM engine (optional): LLLM_HOME=<engine var dir>, LLLM_CLI=<engine>/lllm/cli.py

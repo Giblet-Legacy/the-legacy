@@ -6,15 +6,32 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Good
 
-- (none)
+- `boot.py`: starts the Field (serve_v5, quiet), waits until it answers,
+  then starts The Legacy (v8) pointed at it, and keeps both running; a
+  child that stops is restarted after 1 s, 2 s, 4 s ... 60 s, and the
+  count resets after a minute up. Ctrl-C stops both. Checked live: the
+  Field killed at 11:22:08 was back at 11:22:10.
+- `legacy_v8.py`, `static/projection_v8.html`, `SPEC_V8.md`,
+  `test_legacy_v8.py` (5 tests, run red first, one end to end through
+  boot.py): the status routes keep their last good answer and serve it
+  marked stale when a fresh read fails; every panel on the page
+  refreshes itself, backs off exponentially while a source is down and
+  keeps its last good data; the Field panel waits for the Field and
+  loads it as soon as it is up; claims are fetched with limit=500, so
+  the panel and the face counts cover every claim (v7 showed 60 of 117).
+- 51/51 pass. legacy.py and v2-v7 untouched. Built on James's delegation
+  ("boot one after another and have exponential cool off and refresh
+  and hold a buffer"). Not frozen (NOTES Q11).
 
 ### Bad
 
-- (none)
+- On Windows, killing boot.py itself (not Ctrl-C) leaves its two
+  children running; Ctrl-C in the console stops all three.
 
 ### Ugly
 
-- (none)
+- projection_v8.html is v7's page with its loaders rewritten through one
+  `poll` helper; the rest of the page is copied.
 
 ## [v1.3.0] — 2026-11-13 — FROZEN
 
