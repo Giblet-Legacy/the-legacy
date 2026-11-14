@@ -6,6 +6,20 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Good
 
+- (none)
+
+### Bad
+
+- (none)
+
+### Ugly
+
+- (none)
+
+## [v1.7.0 (with v1.4.0, v1.5.0 and v1.6.0)] — 2026-11-14 — FROZEN
+
+### Good
+
 - `legacy_v10.py`, `boot_v4.py`, `SPEC_V11.md`, `test_legacy_v10.py`
   (3 tests, run red first): the Briefing through the Weaver v1.4, so
   each open question gets its own engine line. v10's handler serves

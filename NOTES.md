@@ -70,11 +70,17 @@ NOTES.md — open questions and decisions for The Legacy.
   and restart checked live. Uses SCP Substrate v5 and Cockpit v1.4, both
   built, not frozen. Raised 2026-11-14. Owner: James.
   **Resolved 2026-11-13 — James: "freeze commmit and push".** Frozen on the laptop run; S24 run still to be confirmed.
+  Correction 2026-11-14: the line above was recorded in error; VERSION never
+  took 1.4.0, so v8 was not frozen then.
+  **Resolved 2026-11-14 — James: "phone worked freeze please".** Frozen; tests pass on the laptop and the S24.
 - **Q12.** Freeze boot_v2 at 1.5.0 (SPEC_V9.md, the Field v6)? Built and
   green on the laptop. Raised 2026-11-14. Owner: James.
+  **Resolved 2026-11-14 — James: "phone worked freeze please".** Frozen; tests pass on the laptop and the S24.
 - **Q13.** Freeze legacy_v9 and boot_v3 at 1.6.0 (SPEC_V10.md: the page
   reads on a phone; the Field v7)? Built and green on the laptop (55/55).
   Raised 2026-11-14. Owner: James.
+  **Resolved 2026-11-14 — James: "phone worked freeze please".** Frozen; tests pass on the laptop and the S24.
 - **Q14.** Freeze legacy_v10 and boot_v4 at 1.7.0 (SPEC_V11.md: the
   Briefing through Weaver v1.4)? Built and green on the laptop (58/58).
   Raised 2026-11-14. Owner: James.
+  **Resolved 2026-11-14 — James: "phone worked freeze please".** Frozen; tests pass on the laptop and the S24.

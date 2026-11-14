@@ -13,12 +13,12 @@ Tier:     Tier 1 — Consumer (The Connector)
 Depends:  All consumers (Cockpit, Substrate, Weaver, SC-OS, Echo)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
-Status:   1.3.0 — v1.0.0 The Projection (legacy_v4), v1.1.0 its redesign
-          (legacy_v5), v1.2.0 multi-face claims (legacy_v6); all frozen.
-          legacy_v7 (SPEC_V7.md: the LLLM wired through) frozen at 1.3.0.
-          legacy_v8 + boot.py (1.4.0), boot_v2 (1.5.0), legacy_v9 +
-          boot_v3 (1.6.0, the page on a phone) and legacy_v10 + boot_v4
-          (1.7.0, the Briefing through Weaver v1.4) built, not frozen.
+Status:   1.7.0 — v1.0.0 The Projection (legacy_v4), v1.1.0 its redesign
+          (legacy_v5), v1.2.0 multi-face claims (legacy_v6), v1.3.0 the
+          LLLM wired through (legacy_v7), v1.4.0 boot together (legacy_v8
+          + boot.py), v1.5.0 boot_v2, v1.6.0 the page on a phone (legacy_v9
+          + boot_v3), v1.7.0 the Briefing through Weaver v1.4 (legacy_v10
+          + boot_v4); all frozen.
 
 ## Running
 
