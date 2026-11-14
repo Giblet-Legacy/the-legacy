@@ -21,6 +21,7 @@ consumers. It does not rewrite them.
 - It is the **glue** — a web dashboard that surfaces all of them.
 
 ## Architecture
+- `legacy_v10.py` + `boot_v4.py` (SPEC_V11.md: the Briefing through Weaver v1.4, one engine line per question; built, not frozen) are the layer over v9. Run `python boot_v4.py`.
 - `legacy_v9.py` + `boot_v3.py` (SPEC_V10.md: the page reads on a phone; the Field v7; built, not frozen) are the layer over v8. Run `python boot_v3.py`.
 - `legacy_v8.py` + `boot.py` (SPEC_V8.md: boot the Field then The Legacy, exponential cool-off, self-refreshing page, last-good buffer; built, not frozen) are the layer over v7. Run `python boot.py`.
 - `legacy_v7.py` (SPEC_V7.md: the LLLM wired through — Voice v0.1.2, Weaver v1.3, Cockpit v1.3; frozen 1.3.0) is the entry point from v7, over v6.

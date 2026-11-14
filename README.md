@@ -16,13 +16,14 @@ Author:   James Gilbert (Giblets Forge)
 Status:   1.3.0 — v1.0.0 The Projection (legacy_v4), v1.1.0 its redesign
           (legacy_v5), v1.2.0 multi-face claims (legacy_v6); all frozen.
           legacy_v7 (SPEC_V7.md: the LLLM wired through) frozen at 1.3.0.
-          legacy_v8 + boot.py (1.4.0), boot_v2 (1.5.0) and legacy_v9 +
-          boot_v3 (1.6.0, the page on a phone) built, not frozen.
+          legacy_v8 + boot.py (1.4.0), boot_v2 (1.5.0), legacy_v9 +
+          boot_v3 (1.6.0, the page on a phone) and legacy_v10 + boot_v4
+          (1.7.0, the Briefing through Weaver v1.4) built, not frozen.
 
 ## Running
 
-    python boot_v3.py                        # the Field (v7), then The Legacy (v9), kept running
-    python legacy_v9.py [--host 127.0.0.1] [--port 8080]
+    python boot_v4.py                        # the Field (v7), then The Legacy (v10), kept running
+    python legacy_v10.py [--host 127.0.0.1] [--port 8080]
     python ../scp-substrate/serve_v7.py      # the 3D Field alone, embedded on the page
     # LLLM engine (optional): LLLM_HOME=<engine var dir>, LLLM_CLI=<engine>/lllm/cli.py
     python -m pytest -q
@@ -36,12 +37,13 @@ somewhere other than `~/Giblets_Legacy`.
 
 ```bash
 cd ~/Giblets_Legacy
-for r in scp-substrate the-legacy; do (cd "$r" && git pull --ff-only && git log --oneline -1); done
+for r in scp-substrate the-legacy the-weaver; do (cd "$r" && git pull --ff-only && git log --oneline -1); done
 (cd scp-substrate && python -m pytest -q)    # browser tests skip: Termux has no Edge or Chrome
 (cd the-legacy && python -m pytest -q)
+(cd the-weaver && python -m pytest -q)
 echo "LLLM_HOME=$LLLM_HOME LLLM_CLI=$LLLM_CLI"
 ls "${LLLM_HOME:-$HOME/lllm/var}/models" 2>&1   # is there an LLLM engine build on this phone?
-cd the-legacy && python boot_v3.py
+cd the-legacy && python boot_v4.py
 ```
 
 Then open <http://127.0.0.1:8080/> in the phone's browser. The Claims
@@ -52,8 +54,8 @@ the Field's orb names should not sit on top of each other.
 `legacy.py` is the frozen v1 shell, `legacy_v2.py` the layer over it
 (SPEC_V2.md), and `legacy_v3.py` the layer over that (SPEC_V3.md:
 current-layer health, Weaver v1.1, /api/nerves), and so on up to
-`legacy_v9.py` (SPEC_V10.md; every layer is listed in CLAUDE.md). Run
-`boot_v3.py`.
+`legacy_v10.py` (SPEC_V11.md; every layer is listed in CLAUDE.md). Run
+`boot_v4.py`.
 
 ## What The Legacy shows
 

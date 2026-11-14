@@ -6,6 +6,14 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Good
 
+- `legacy_v10.py`, `boot_v4.py`, `SPEC_V11.md`, `test_legacy_v10.py`
+  (3 tests, run red first): the Briefing through the Weaver v1.4, so
+  each open question gets its own engine line. v10's handler serves
+  /api/weaver itself; v7 is not replaced (a first try that swapped v7's
+  Weaver at import also changed the frozen v7 tests' Weaver in the same
+  run, and was replaced). `python boot_v4.py` starts the Field v7 then
+  The Legacy v10. Checked live on James's data. 58/58 pass. Not frozen
+  (NOTES Q14).
 - `legacy_v9.py`, `static/projection_v9.html`, `boot_v3.py`,
   `SPEC_V10.md`, `test_legacy_v9.py` (3 tests, run red first against a
   plain copy of the v8 page): on a phone the Claims and Ledger tables

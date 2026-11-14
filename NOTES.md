@@ -75,3 +75,6 @@ NOTES.md — open questions and decisions for The Legacy.
 - **Q13.** Freeze legacy_v9 and boot_v3 at 1.6.0 (SPEC_V10.md: the page
   reads on a phone; the Field v7)? Built and green on the laptop (55/55).
   Raised 2026-11-14. Owner: James.
+- **Q14.** Freeze legacy_v10 and boot_v4 at 1.7.0 (SPEC_V11.md: the
+  Briefing through Weaver v1.4)? Built and green on the laptop (58/58).
+  Raised 2026-11-14. Owner: James.
