@@ -6,6 +6,18 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Good
 
+- `legacy_v9.py`, `static/projection_v9.html`, `boot_v3.py`,
+  `SPEC_V10.md`, `test_legacy_v9.py` (3 tests, run red first against a
+  plain copy of the v8 page): on a phone the Claims and Ledger tables
+  drop their ID/Hash/Prev columns, so the text gets the width (v8
+  squeezed it to three or four letters a line); grid columns never grow
+  past their share; hints name boot_v3 and serve_v7. `python boot_v3.py`
+  starts the Field v7 then The Legacy v9. 55/55 pass. Built on James's
+  delegation ("take a bunch of screenshots and report", "yes"). Not
+  frozen (NOTES Q13).
+- `boot_v2.py`, `SPEC_V9.md`, `test_boot_v2.py`: boot.py with SCP
+  Substrate serve_v6 as the Field. Run `python boot_v2.py`. Built, not
+  frozen (NOTES Q12).
 - `boot.py`: starts the Field (serve_v5, quiet), waits until it answers,
   then starts The Legacy (v8) pointed at it, and keeps both running; a
   child that stops is restarted after 1 s, 2 s, 4 s ... 60 s, and the
@@ -25,6 +37,10 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Bad
 
+- My screenshot report said the page ran off a phone's right edge.
+  Wrong: headless Edge will not make a window narrower than about 500
+  px, so the "412 px" shot was a 496 px page cut short. Measured in a
+  true 412 px frame the cards fit; the real fault was the squeezed text.
 - On Windows, killing boot.py itself (not Ctrl-C) leaves its two
   children running; Ctrl-C in the console stops all three.
 

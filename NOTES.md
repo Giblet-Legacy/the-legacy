@@ -70,3 +70,8 @@ NOTES.md — open questions and decisions for The Legacy.
   and restart checked live. Uses SCP Substrate v5 and Cockpit v1.4, both
   built, not frozen. Raised 2026-11-14. Owner: James.
   **Resolved 2026-11-13 — James: "freeze commmit and push".** Frozen on the laptop run; S24 run still to be confirmed.
+- **Q12.** Freeze boot_v2 at 1.5.0 (SPEC_V9.md, the Field v6)? Built and
+  green on the laptop. Raised 2026-11-14. Owner: James.
+- **Q13.** Freeze legacy_v9 and boot_v3 at 1.6.0 (SPEC_V10.md: the page
+  reads on a phone; the Field v7)? Built and green on the laptop (55/55).
+  Raised 2026-11-14. Owner: James.
