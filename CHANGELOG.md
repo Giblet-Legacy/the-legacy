@@ -6,11 +6,17 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Good
 
-- (none)
+- `boot_v5.py`, `SPEC_V12.md`, `test_boot_v5.py` (1 test, run red
+  first): boot_v4 with the Field v8 (scp-substrate SPEC_V8.md), so
+  James is the centre of the embedded Field and his projects orbit him.
+  boot_v4 untouched. Built on James's delegation. Not frozen (NOTES).
 
 ### Bad
 
-- (none)
+- `test_legacy_v8.py::test_boot_end_to_end` (frozen v1.4.0, real servers
+  on real ports) failed in 2 of 4 full runs on the laptop on 2026-11-15
+  and passed in the other two; boot_v5 does not touch it. Flaky on
+  timing, not fixed here.
 
 ### Ugly
 

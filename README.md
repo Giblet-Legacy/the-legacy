@@ -22,6 +22,7 @@ Status:   1.7.0 — v1.0.0 The Projection (legacy_v4), v1.1.0 its redesign
 
 ## Running
 
+    python boot_v5.py                        # the Field (v8, you at the centre), then The Legacy (v10)
     python boot_v4.py                        # the Field (v7), then The Legacy (v10), kept running
     python legacy_v10.py [--host 127.0.0.1] [--port 8080]
     python ../scp-substrate/serve_v7.py      # the 3D Field alone, embedded on the page
@@ -43,7 +44,7 @@ for r in scp-substrate the-legacy the-weaver; do (cd "$r" && git pull --ff-only 
 (cd the-weaver && python -m pytest -q)
 echo "LLLM_HOME=$LLLM_HOME LLLM_CLI=$LLLM_CLI"
 ls "${LLLM_HOME:-$HOME/lllm/var}/models" 2>&1   # is there an LLLM engine build on this phone?
-cd the-legacy && python boot_v4.py
+cd the-legacy && python boot_v5.py
 ```
 
 Then open <http://127.0.0.1:8080/> in the phone's browser. The Claims

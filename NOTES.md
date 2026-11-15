@@ -22,6 +22,10 @@ NOTES.md — open questions and decisions for The Legacy.
 
 ## Open questions
 
+- **Freeze boot_v5 at 1.8.0?** The Field v8 (SPEC_V12.md). Built and
+  green on the laptop. Not yet run on the S24. Raised 2026-11-15.
+  Owner: James.
+
 - **Q1.** Health check depth. Should The Legacy run `forge health`
   as a subprocess (slow, ~2s, but isolated) or import `forge_cli`
   directly (fast, but couples The Legacy to the Cockpit's internals)?
