@@ -6,6 +6,14 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Good
 
+- `legacy_v11.py`, `boot_v6.py`, `SPEC_V13.md`, `test_legacy_v11.py`
+  (8 tests, run red first): one link (James, 2026-11-16: "i would
+  prefer just a single weblink"). `/api/field` gives the page
+  `FORGE_FIELD_PUBLIC_URL` (a `/` path or an http(s) URL; anything else
+  ignored) while the health probe still uses `FORGE_FIELD_URL`, so on
+  the VPS the embedded Field is `/field/` on the Legacy's own tailnet
+  address. No variable, no change: a laptop behaves as v10. 67/67.
+  Not frozen.
 - `boot_v5.py`, `SPEC_V12.md`, `test_boot_v5.py` (1 test, run red
   first): boot_v4 with the Field v8 (scp-substrate SPEC_V8.md), so
   James is the centre of the embedded Field and his projects orbit him.
@@ -13,6 +21,9 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ### Bad
 
+- `test_legacy_v8.py::test_boot_end_to_end` failed once in a full run
+  (2026-11-16) and passed alone and on rerun: it waits on real child
+  processes, so it is timing-sensitive. Flaky, not broken.
 - `test_legacy_v8.py::test_boot_end_to_end` (frozen v1.4.0, real servers
   on real ports) failed in 2 of 4 full runs on the laptop on 2026-11-15
   and passed in the other two; boot_v5 does not touch it. Flaky on
