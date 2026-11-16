@@ -22,7 +22,7 @@ Public API:
 Tier:     Tier 1 — Consumer (The Connector)
 Depends:  legacy_v10.py (SPEC_V11.md 1.7.0), legacy_v4.py (field_status)
 Spec:     SPEC_V13.md 1.9.0
-Version:  1.9.0-dev
+Version:  1.9.0 (frozen 2026-11-16)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
 """

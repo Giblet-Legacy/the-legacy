@@ -88,3 +88,20 @@ NOTES.md — open questions and decisions for The Legacy.
   Briefing through Weaver v1.4)? Built and green on the laptop (58/58).
   Raised 2026-11-14. Owner: James.
   **Resolved 2026-11-14 — James: "phone worked freeze please".** Frozen; tests pass on the laptop and the S24.
+- **Q15.** Freeze boot_v5 at 1.8.0 (SPEC_V12.md: the Field v8, you at the
+  centre)? Built and green on the laptop. Raised 2026-11-15. Owner: James.
+  **Resolved 2026-11-16 — James: "commit and push and freeze".** Frozen; 67/67 on the laptop.
+- **Q16.** Freeze legacy_v11 and boot_v6 at 1.9.0 (SPEC_V13.md: one link)?
+  Built and green on the laptop (67/67); running on the VPS, the Legacy
+  and its Field opened from the S24 and the PC on one tailnet link.
+  Raised 2026-11-16. Owner: James.
+  **Resolved 2026-11-16 — James: "commit and push and freeze".** Frozen; 67/67 on the laptop.
+- **Q17.** SCP Substrate serve_v8 / view_v4, which boot_v5 and boot_v6 start
+  as the Field, is still 8.0.0-dev in scp-substrate. Freeze it too?
+  Raised 2026-11-16. Owner: James.
+- **Q18.** `test_legacy_v8.py::test_boot_end_to_end` is racy: it stops boot
+  as soon as `/api/field` answers, then asserts boot has already logged
+  `legacy up`, which boot writes on its own poll. On 2026-11-16 it failed
+  3 of 5 runs alone (boot.py and legacy_v8 unchanged). Fix as a new test
+  layer that waits for both log lines before stopping boot. Raised
+  2026-11-16. Owner: James.

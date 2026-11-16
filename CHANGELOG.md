@@ -4,6 +4,17 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ## [Unreleased]
 
+### Frozen 2026-11-16 (James: "commit and push and freeze")
+
+- boot_v5.py 1.8.0 (SPEC_V12.md) and legacy_v11.py + boot_v6.py 1.9.0
+  (SPEC_V13.md). VERSION 1.7.0 -> 1.9.0. 67/67 on the laptop; v11 in use on
+  the VPS from the S24 and the PC. The Field they start (scp-substrate
+  serve_v8) is not frozen yet (NOTES Q17).
+- At the freeze, 66/67: `test_legacy_v8.py::test_boot_end_to_end` fails
+  intermittently (3 of 5 runs alone), a race in that test, not in the
+  frozen layers; it touches only boot.py and legacy_v8 (NOTES Q18). All
+  8 v11 tests pass.
+
 ### Good
 
 - `legacy_v11.py`, `boot_v6.py`, `SPEC_V13.md`, `test_legacy_v11.py`
