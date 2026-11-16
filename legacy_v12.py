@@ -28,7 +28,7 @@ Internal helpers:
 Tier:     Tier 1 — Consumer (The Connector)
 Depends:  legacy_v11.py (1.9.0), legacy_v4.py (guard, Echo), forge_cli_v1_7 (1.7.0), substrate_v4 (4.0.0)
 Spec:     SPEC_V14.md 1.10.0
-Version:  1.10.0-dev
+Version:  1.10.0 (frozen 2026-11-16)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
 """

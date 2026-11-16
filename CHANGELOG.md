@@ -4,7 +4,16 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ## [Unreleased]
 
-### Good (v12, not frozen)
+### Frozen 2026-11-16 (James: "freeze all")
+
+- legacy_v12.py + boot_v7.py 1.10.0 (SPEC_V14.md), with Cockpit
+  forge_cli_v1_7.py 1.7.0. VERSION 1.9.0 -> 1.10.0. 73/74 on the laptop:
+  the failure is `test_legacy_v8.py::test_boot_end_to_end` (NOTES Q18,
+  the known race), which passed when re-run alone. All 7 v12 tests pass.
+  The VPS's run-latest picks boot_v7 up at its next refresh (within the
+  hour), so the tabs reach the tailnet page without a step on the VPS.
+
+### Good
 
 - `legacy_v12.py`, `boot_v7.py`, `static/projection_v10.html`, `SPEC_V14.md`,
   `test_legacy_v12.py` (7 tests, run red first): the "New claim" card is "New",

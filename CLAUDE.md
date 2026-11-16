@@ -21,7 +21,7 @@ consumers. It does not rewrite them.
 - It is the **glue** — a web dashboard that surfaces all of them.
 
 ## Architecture
-- `boot_v7.py` + `legacy_v12.py` (SPEC_V14.md: New entity / subject / claim tabs with drop-downs; drafts for Cockpit v1.7; 1.10.0-dev, not frozen). Run `python boot_v7.py`.
+- `boot_v7.py` + `legacy_v12.py` (SPEC_V14.md: New entity / subject / claim tabs with drop-downs; drafts for Cockpit 1.7.0; frozen 1.10.0). Run `python boot_v7.py`.
 - `boot_v6.py` + `legacy_v11.py` (SPEC_V13.md: one link — the page is told `FORGE_FIELD_PUBLIC_URL` for the Field, e.g. `/field/` on the VPS; frozen 1.9.0). Run `python boot_v6.py`.
 - `boot_v5.py` (SPEC_V12.md: the Field v8, you at the centre; frozen 1.8.0) is boot_v4 with serve_v8. Run `python boot_v5.py`.
 - `legacy_v10.py` + `boot_v4.py` (SPEC_V11.md: the Briefing through Weaver v1.4, one engine line per question; frozen 1.7.0) are the layer over v9. Run `python boot_v4.py`.

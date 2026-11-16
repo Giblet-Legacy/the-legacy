@@ -25,4 +25,6 @@
 
 # 1.9.0 — legacy_v11.py + boot_v6.py frozen (SPEC_V13.md: one link, the Field at FORGE_FIELD_PUBLIC_URL). 67/67 on the laptop; in use on the VPS, viewed from the S24 and the PC.
 
-1.9.0
+# 1.10.0 — legacy_v12.py + boot_v7.py frozen (SPEC_V14.md: New entity / subject / claim tabs with drop-downs, drafts for Cockpit 1.7.0). 73/74 on the laptop; the one failure is Q18's race, which passes alone.
+
+1.10.0
