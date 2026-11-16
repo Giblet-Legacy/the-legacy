@@ -4,6 +4,23 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ## [Unreleased]
 
+### Good (v12, not frozen)
+
+- `legacy_v12.py`, `boot_v7.py`, `static/projection_v10.html`, `SPEC_V14.md`,
+  `test_legacy_v12.py` (7 tests, run red first): the "New claim" card is "New",
+  with tabs for an Entity (a name), a Subject (a name, its entity from a
+  drop-down) and a Claim (its subject, or an entity, from a drop-down). The
+  drop-downs come from `GET /api/nouns` (P9 v4 plus pending drafts, marked
+  "(draft)"); every tab saves a draft for `forge_cli_v1_7.py inbox commit`.
+  Checked in headless Edge on demo data: one form per tab, drop-downs filled.
+  73/74 (Q18's race the only failure). James, 2026-11-16.
+
+### Ugly
+
+- The first render showed all three forms at once: `form.grid` set
+  `display: grid` and beat the `hidden` attribute. Fixed with
+  `form.grid[hidden] { display: none; }`, and the page test checks for it.
+
 ### Frozen 2026-11-16 (James: "commit and push and freeze")
 
 - boot_v5.py 1.8.0 (SPEC_V12.md) and legacy_v11.py + boot_v6.py 1.9.0

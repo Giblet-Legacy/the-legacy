@@ -1,0 +1,604 @@
+<!doctype html>
+<!--
+  projection_v10.html — The Legacy v12 page (SPEC_V14.md §1): v9's page with the "New claim"
+  card made "New", with three tabs: Entity (a name, linked to nothing), Subject (a name and its
+  entity from a drop-down) and Claim (its subject, or an entity, from a drop-down). Drop-downs
+  come from GET /api/nouns (P9 v4 plus pending drafts); every tab saves a draft committed by
+  `forge_cli_v1_7.py inbox commit`. Below, v9's description.
+  projection_v9.html — The Legacy v9 page (SPEC_V10.md §2): v8's page, reading on a phone: the
+  Claims and Ledger tables drop their hash columns at 560 px and narrower so the text gets the
+  width; grid columns never grow past their share; hints name boot_v3.py and serve_v7.py.
+  Before that, v8 (SPEC_V8.md §4): v7's page, every panel refreshes itself,
+  backs off exponentially while a source is down and keeps its last good data; claims limit=500;
+  hints name boot.py and serve_v5. Before that, v7: Voice replies keep line breaks. Below, v6's description: v5's design, with every filled face
+  counted, a Subject column, a filterable ledger, better suggestions, serve_v3 hints.
+  Function: a clean technical console over the whole stack: metrics,
+  layer status, claims by face, Query (the Voice), the ledger and claims
+  as tables, the Field, New claim (Echo result, inbox draft), Network,
+  Briefing, LLLM. Reads legacy_v5.py's JSON routes; its only write is
+  "Save draft" (POST /api/inbox), committed by the operator in the
+  terminal. Vanilla HTML/CSS/JS, system fonts only (works offline),
+  light and dark. Every interpolated value is escaped.
+  Licence: MSL-1.0. Author: James Gilbert (Giblets Forge).
+-->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Legacy</title>
+<style>
+  :root {
+    --bg: #0b0c0e; --surface: #111317; --surface2: #171a1f; --border: #23272e; --border2: #2e333b;
+    --text: #e7e9ec; --muted: #9098a3; --dim: #5f6670;
+    --accent: #5b8cff; --accent-soft: rgba(91, 140, 255, .12);
+    --ok: #3fb950; --warn: #d29922; --bad: #f85149;
+    --FACT: #5b8cff; --COUNTER: #f0645a; --OPINION: #e3b341; --FICTION: #a77bf3; --CONTEXT: #2bb5a0; --UNKNOWN: #8a919c;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
+    --r: 8px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f6f7f9; --surface: #ffffff; --surface2: #f2f4f7; --border: #e2e5ea; --border2: #d3d8df;
+      --text: #12161c; --muted: #5a626d; --dim: #8b929c;
+      --accent: #2f6bff; --accent-soft: rgba(47, 107, 255, .09);
+      --ok: #1f883d; --warn: #9a6700; --bad: #cf222e;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body { font: 14px/1.5 var(--sans); font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+  .mono { font-family: var(--mono); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 24px; background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px); border-bottom: 1px solid var(--border);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -.01em; }
+  .mark {
+    width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center;
+    background: var(--text); color: var(--bg); font: 700 12px var(--mono);
+  }
+  .crumb { color: var(--dim); font-weight: 400; }
+  .pills { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--surface); font: 12px var(--mono); color: var(--muted);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--dim); flex-shrink: 0; }
+  .dot.ok { background: var(--ok); } .dot.bad { background: var(--bad); } .dot.warn { background: var(--warn); }
+
+  main { max-width: 1280px; margin: 0 auto; padding: 24px; display: grid; gap: 16px; grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); min-width: 0; }
+  .card > header {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+  }
+  .card h2 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .01em; }
+  .card header .meta { font: 12px var(--mono); color: var(--dim); }
+  .card .body { padding: 16px; }
+  .span-12 { grid-column: span 12; } .span-8 { grid-column: span 8; } .span-7 { grid-column: span 7; }
+  .span-6 { grid-column: span 6; } .span-5 { grid-column: span 5; } .span-4 { grid-column: span 4; }
+  .muted { color: var(--dim); }
+  .error { color: var(--bad); }
+
+  /* metrics */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .metric { padding: 16px; border-right: 1px solid var(--border); }
+  .metric:last-child { border-right: 0; }
+  .metric .k { font: 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+  .metric .v { font-size: 28px; font-weight: 600; letter-spacing: -.02em; margin-top: 4px; }
+  .metric .s { font-size: 12.5px; color: var(--muted); }
+
+  /* layers */
+  .layers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .layer { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; background: var(--surface2); }
+  .layer .id { display: flex; align-items: center; justify-content: space-between; font: 12px var(--mono); color: var(--muted); }
+  .layer .nm { font-size: 12.5px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .layer.bad { border-color: var(--bad); }
+
+  /* faces */
+  .stack { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--surface2); }
+  .stack i { display: block; height: 100%; }
+  .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 18px; margin-top: 14px; }
+  .legend .r { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; }
+  .legend .r .n { margin-left: auto; font-family: var(--mono); }
+  .sw { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  /* query */
+  .console { display: flex; gap: 8px; }
+  .console .in {
+    flex: 1; display: flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid var(--border2);
+    border-radius: var(--r); background: var(--surface2);
+  }
+  .console .in:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .console .in span { font: 600 14px var(--mono); color: var(--accent); }
+  .console input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--text); font: 14px var(--mono); padding: 11px 0; outline: none; }
+  button {
+    font: 500 13px var(--sans); cursor: pointer; border-radius: var(--r); padding: 0 16px; min-height: 38px;
+    border: 1px solid var(--accent); background: var(--accent); color: #fff;
+  }
+  button.sec { background: var(--surface2); color: var(--muted); border-color: var(--border2); min-height: 28px; padding: 0 10px; font-size: 12px; font-family: var(--mono); }
+  button.sec:hover { color: var(--text); border-color: var(--accent); }
+  button.sec.on { color: var(--text); border-color: var(--accent); background: var(--accent-soft); }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-right: auto; margin-left: 12px; }
+  form.grid[hidden] { display: none; }  /* form.grid would otherwise override the hidden attribute (SPEC_V14 §1 tabs) */
+  .also { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+  .also b { font: 600 10.5px var(--mono); letter-spacing: .05em; }
+  button:disabled { opacity: .5; cursor: default; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .log { margin-top: 6px; }
+  .turn { padding: 12px 0; border-top: 1px solid var(--border); display: grid; gap: 4px; }
+  .turn .q { font: 12.5px var(--mono); color: var(--muted); }
+  .turn .a { font-size: 15px; overflow-wrap: anywhere; white-space: pre-line; }
+  .turn .a.unknown { color: var(--muted); }
+  .cite { font: 11.5px var(--mono); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border2); color: var(--accent); margin-left: 4px; background: var(--surface2); }
+  .badge { font: 11px var(--mono); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border2); color: var(--muted); white-space: nowrap; }
+  details summary { cursor: pointer; font: 12px var(--mono); color: var(--dim); }
+  pre { margin: 6px 0 0; padding: 10px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border);
+        font: 12px/1.55 var(--mono); color: var(--muted); white-space: pre-wrap; overflow-wrap: anywhere; }
+
+  /* tables */
+  .tbl { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font: 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--dim);
+       font-weight: 500; padding: 8px 16px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 8px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.h { font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+  td.t { overflow-wrap: anywhere; }
+  .k-claim { color: var(--FACT); } .k-seal { color: var(--ok); } .k-proposal { color: var(--warn); } .k-lllm { color: var(--FICTION); }
+
+  /* forms */
+  form.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  label { display: grid; gap: 5px; font: 12px var(--mono); color: var(--muted); }
+  .full { grid-column: 1 / -1; }
+  input, select, textarea {
+    font: 14px var(--sans); color: var(--text); background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: var(--r); padding: 8px 10px; width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  textarea { min-height: 70px; resize: vertical; }
+  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .kv:last-child { border-bottom: 0; }
+  .kv .k { color: var(--muted); } .kv .v { font-family: var(--mono); text-align: right; overflow-wrap: anywhere; min-width: 0; }
+  .ok-t { color: var(--ok); } .bad-t { color: var(--bad); }
+  iframe { width: 100%; height: 520px; border: 0; display: block; border-radius: 0 0 var(--r) var(--r); background: #000; }
+  code { font: 12.5px var(--mono); background: var(--surface2); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; }
+  footer { grid-column: span 12; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+           padding: 8px 2px 24px; font: 12px var(--mono); color: var(--dim); }
+
+  @media (max-width: 1000px) {
+    .span-8, .span-7, .span-6, .span-5, .span-4 { grid-column: span 12; }
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .metric:nth-child(2) { border-right: 0; }
+    .metric:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+  }
+  @media (max-width: 560px) {
+    main { padding: 16px; gap: 12px; }
+    .topbar { padding: 10px 16px; }
+    .layers { grid-template-columns: repeat(3, 1fr); }
+    .legend, form.grid { grid-template-columns: 1fr; }
+    .console { flex-direction: column; }
+    th, td { padding: 8px 12px; }
+    iframe { height: 360px; }
+    /* v9: the hash columns give their width to the text (SPEC_V10 §2) */
+    table:has(#claims) tr > :nth-child(4), table:has(#ledger) tr > :nth-child(n+4) { display: none; }
+    #claims td.h:first-child { white-space: normal; overflow-wrap: anywhere; }
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><span class="mark">L</span>The Legacy <span class="crumb">/ projection</span></div>
+  <div class="pills" id="pills"><span class="pill"><span class="dot"></span>loading</span></div>
+</div>
+
+<main>
+  <section class="card span-12" aria-labelledby="metrics-h">
+    <header><h2 id="metrics-h">Metrics</h2><span class="meta" id="clock"></span> <span id="fresh"></span></header>
+    <div class="metrics" id="metrics"></div>
+  </section>
+
+  <section class="card span-7" aria-labelledby="layers-h">
+    <header><h2 id="layers-h">Layers</h2><span class="meta" id="layers-meta"></span></header>
+    <div class="body"><div class="layers" id="layers"></div></div>
+  </section>
+
+  <section class="card span-5" aria-labelledby="faces-h">
+    <header><h2 id="faces-h">Faces filled</h2><span class="meta" id="faces-meta"></span></header>
+    <div class="body"><div class="stack" id="stack"></div><div class="legend" id="legend"></div></div>
+  </section>
+
+  <section class="card span-12" aria-labelledby="query-h">
+    <header><h2 id="query-h">Query</h2><span class="meta">the Voice · answers only from FACT, COUNTER and CONTEXT claims</span></header>
+    <div class="body">
+      <form id="voice" class="console" autocomplete="off">
+        <label class="in" aria-label="Query"><span>&gt;</span><input name="q" maxlength="2000" required placeholder="is the sky blue?"></label>
+        <button type="submit">Run</button>
+      </form>
+      <div class="chips" id="suggest"></div>
+      <div class="log" id="voice-log"></div>
+    </div>
+  </section>
+
+  <section class="card span-12" aria-labelledby="claims-h">
+    <header><h2 id="claims-h">Claims</h2><span class="meta" id="claims-meta"></span></header>
+    <div class="tbl"><table><thead><tr><th>Subject</th><th>Face</th><th>Claim</th><th>ID</th></tr></thead><tbody id="claims"></tbody></table></div>
+  </section>
+
+  <section class="card span-12" aria-labelledby="ledger-h">
+    <header><h2 id="ledger-h">Ledger</h2><span class="tabs" id="ledger-tabs"><button type="button" class="sec on" data-kind="">All</button><button type="button" class="sec" data-kind="claim">Claims</button><button type="button" class="sec" data-kind="seal">Seals</button><button type="button" class="sec" data-kind="proposal">Proposals</button></span><span class="meta" id="ledger-meta"></span></header>
+    <div class="tbl"><table><thead><tr><th>Seq</th><th>Kind</th><th>Entry</th><th>Hash</th><th>Prev</th></tr></thead>
+      <tbody id="ledger"></tbody></table></div>
+  </section>
+
+  <section class="card span-12" aria-labelledby="field-h">
+    <header><h2 id="field-h">Field</h2><span class="meta" id="field-meta"></span></header>
+    <div id="field"><div class="body muted">Checking SCP Substrate…</div></div>
+  </section>
+
+  <section class="card span-7" aria-labelledby="new-h">
+    <header><h2 id="new-h">New</h2><span class="tabs" id="new-tabs"><button type="button" class="sec" data-new="entity">Entity</button><button type="button" class="sec" data-new="subject">Subject</button><button type="button" class="sec on" data-new="claim">Claim</button></span><span class="meta">saved as a draft · signed in the terminal</span></header>
+    <div class="body">
+      <form id="new-entity" class="grid" autocomplete="off" hidden>
+        <label class="full">Entity name<input name="name" maxlength="200" required placeholder="James Gilbert"></label>
+        <div class="full muted" style="font-size:12.5px">An entity stands alone: a person, an organisation, a thing.</div>
+        <div class="full"><button type="submit">Save draft</button></div>
+      </form>
+      <form id="new-subject" class="grid" autocomplete="off" hidden>
+        <label>Subject name<input name="name" maxlength="200" required placeholder="Nova-bot"></label>
+        <label>Belongs to<select name="entity" id="pick-entity" required></select></label>
+        <div class="full"><button type="submit">Save draft</button></div>
+      </form>
+      <form id="remember" class="grid" autocomplete="off">
+        <label>Subject<select name="subject" id="pick-subject" required></select></label>
+        <label>Object<input name="object" maxlength="200" required placeholder="blue"></label>
+        <label class="full">Face<select name="face"><option>FACT</option><option>COUNTER</option><option>OPINION</option>
+          <option>FICTION</option><option>CONTEXT</option><option>UNKNOWN</option></select></label>
+        <label class="full">Text<textarea name="text" maxlength="2000" required placeholder="The sky is blue"></textarea></label>
+        <div class="full"><button type="submit" id="save" disabled>Save draft</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section class="card span-5" aria-labelledby="echo-h">
+    <header><h2 id="echo-h">Echo</h2><span class="meta">what committing it would do</span></header>
+    <div class="body"><div id="preview" class="muted">Enter a subject and object to preview.</div><div id="inbox"></div></div>
+  </section>
+
+  <section class="card span-4" aria-labelledby="net-h">
+    <header><h2 id="net-h">Network</h2><span class="meta">SC-OS pins</span></header>
+    <div class="body" id="nerves"><span class="muted">Loading…</span></div>
+  </section>
+
+  <section class="card span-4" aria-labelledby="brief-h">
+    <header><h2 id="brief-h">Briefing</h2><span class="meta">the Weaver</span></header>
+    <div class="body" id="weaver"><span class="muted">Loading…</span></div>
+  </section>
+
+  <section class="card span-4" aria-labelledby="lllm-h">
+    <header><h2 id="lllm-h">LLLM</h2><span class="meta">build provenance</span></header>
+    <div class="body" id="lllm"><span class="muted">Loading…</span></div>
+  </section>
+
+  <footer><span>local-first · signed · read-only except drafts</span><span>Giblets Forge · now forge yours</span></footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var FACES = ["FACT", "COUNTER", "OPINION", "FICTION", "CONTEXT", "UNKNOWN"];
+  var GENESIS = "0000000000000000000000000000000000000000000000000000000000000000";
+
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+  function $(id) { return document.getElementById(id); }
+  function get(path) { return fetch(path, { headers: { Accept: "application/json" } }).then(function (r) { return r.json(); }); }
+  function fail(el, what) { return function (e) { el.innerHTML = '<span class="error">' + escapeHtml(what + ": " + e) + "</span>"; }; }
+  function short(h) { return h ? String(h).slice(0, 12) : "—"; }
+  function kv(k, v, cls) { return '<div class="kv"><span class="k">' + escapeHtml(k) + '</span><span class="v ' + (cls || "") + '">' + escapeHtml(v) + "</span></div>"; }
+  function pill(text, state) { return '<span class="pill"><span class="dot ' + (state || "") + '"></span>' + escapeHtml(text) + "</span>"; }
+  function metric(k, v, s) { return '<div class="metric"><div class="k">' + escapeHtml(k) + '</div><div class="v">' + escapeHtml(v) + '</div><div class="s">' + escapeHtml(s) + "</div></div>"; }
+  $("clock").textContent = new Date().toISOString().replace("T", " ").slice(0, 16) + " UTC";
+
+  var state = { layers: null, cockpit: null, peers: null };
+  function renderTop() {
+    var p = [];
+    if (state.layers) { var ok = state.layers.filter(function (l) { return l.status === "PASS"; }).length;
+      p.push(pill(ok + "/" + state.layers.length + " layers", ok === state.layers.length ? "ok" : "bad")); }
+    if (state.cockpit) { var l = state.cockpit.ledger;
+      if (l.self_consistent !== null) { p.push(pill("chain " + (l.self_consistent ? "verified" : "broken"), l.self_consistent ? "ok" : "bad")); }
+      if (l.p8_mirror !== null) { p.push(pill("mirror " + (l.p8_mirror ? "ok" : "differs"), l.p8_mirror ? "ok" : "bad")); } }
+    $("pills").innerHTML = p.join("") || pill("loading");
+  }
+  function renderMetrics() {
+    var s = state.cockpit; if (!s) { return; }
+    $("metrics").innerHTML =
+      metric("Claims", s.claims.total, s.claims.attested + " sealed · " + (s.lllm_opinions || 0) + " LLLM opinions") +
+      metric("Ledger", s.ledger.entries, s.ledger.self_consistent ? "chain verified (P6)" : "not verified") +
+      metric("Drafts", s.inbox.pending, s.inbox.done + " committed · " + s.inbox.refused + " refused") +
+      metric("Peers", state.peers === null ? "—" : state.peers, "pinned via SC-OS");
+  }
+
+  // refresh with exponential cool-off; each panel keeps its last good data (SPEC_V8 §4)
+  function backoff(n, base, cap) { return Math.min(cap, base * Math.pow(2, Math.max(1, n) - 1)); }
+  var buffers = {}, stale = {};
+  function freshness() {
+    var names = Object.keys(stale).filter(function (k) { return stale[k]; });
+    $("fresh").innerHTML = names.length ? pill("stale: " + names.join(", ") + " · retrying", "bad")
+      : pill("live · " + new Date().toTimeString().slice(0, 8), "ok");
+  }
+  function poll(name, path, every, render, el) {
+    var n = 0, timer = null;
+    function tick() {
+      clearTimeout(timer);
+      get(typeof path === "function" ? path() : path).then(function (d) {
+        var soft = d && d.stale;
+        if (!soft) { buffers[name] = d; }
+        render(d);
+        stale[name] = Boolean(soft);
+        n = soft ? n + 1 : 0;
+        freshness();
+        timer = setTimeout(tick, (soft ? backoff(n, 2, 60) : every) * 1000);
+      }).catch(function (e) {
+        n++; var wait = backoff(n, 2, 60);
+        if (buffers[name]) { render(buffers[name]); }
+        else if (el) { el().innerHTML = '<span class="error">' + escapeHtml(name + " unavailable: " + e) + " · retrying in " + wait + "s</span>"; }
+        stale[name] = true; freshness();
+        timer = setTimeout(tick, wait * 1000);
+      });
+    }
+    tick();
+    return { now: tick };
+  }
+
+  // layers
+  poll("health", "/api/health", 60, function (d) {
+    state.layers = d.layers || [];
+    var ok = 0;
+    $("layers").innerHTML = state.layers.map(function (l) {
+      var pass = l.status === "PASS"; if (pass) { ok++; }
+      var parts = l.layer.split(" "), id = parts.shift();
+      return '<div class="layer ' + (pass ? "" : "bad") + '" title="' + escapeHtml(pass ? "PASS" : l.error) + '"><div class="id">' + escapeHtml(id) +
+             '<span class="dot ' + (pass ? "ok" : "bad") + '"></span></div><div class="nm">' + escapeHtml(parts.join(" ")) + "</div></div>";
+    }).join("");
+    $("layers-meta").textContent = ok + " of " + state.layers.length + " passing · live round trips";
+    renderTop();
+  }, function () { return $("layers"); });
+
+  // cockpit status
+  poll("status", "/api/cockpit", 15, function (d) {
+    if (!d.available) { $("metrics").innerHTML = '<div class="body error">' + escapeHtml(d.error) + "</div>"; return; }
+    state.cockpit = d.status;
+    var l = d.status.ledger;
+    renderTop(); renderMetrics();
+  }, function () { return $("metrics"); });
+
+  // claims and faces filled (SPEC_V6 §3)
+  poll("claims", "/api/claims?limit=500", 30, function (d) {
+    var claims = d.claims || [], filled = {}, main = {}, sealed = 0, totalFaces = 0;
+    FACES.forEach(function (f) { filled[f] = 0; main[f] = 0; });
+    claims.forEach(function (c) {
+      Object.keys(c.faces || {}).forEach(function (f) { if (filled[f] !== undefined) { filled[f]++; totalFaces++; } });
+      if (main[c.face] !== undefined) { main[c.face]++; }
+      if (c.attested) { sealed++; }
+    });
+    var denom = totalFaces || 1;
+    $("stack").innerHTML = FACES.map(function (f) { return filled[f] ? '<i style="width:' + (100 * filled[f] / denom) + '%;background:var(--' + f + ')" title="' + f + " " + filled[f] + '"></i>' : ""; }).join("");
+    $("legend").innerHTML = FACES.map(function (f) {
+      return '<div class="r"><span class="sw" style="background:var(--' + f + ')"></span>' + f + '<span class="n">' + filled[f] + "</span></div>";
+    }).join("");
+    var split = FACES.filter(function (f) { return main[f]; }).map(function (f) { return main[f] + " " + f; }).join(" · ");
+    $("faces-meta").textContent = totalFaces + " faces on " + claims.length + " cubes" + (split ? " · main: " + split : "");
+    $("claims-meta").textContent = claims.length + " claims · " + sealed + " sealed";
+    $("claims").innerHTML = claims.slice(0, 12).map(function (c) {
+      var also = Object.keys(c.faces || {}).filter(function (f) { return f !== c.face; }).map(function (f) {
+        return '<div class="also"><b style="color:var(--' + f + ')">' + f + "</b> " + escapeHtml(c.faces[f]) + "</div>";
+      }).join("");
+      return '<tr><td class="h">' + escapeHtml(c.subject || "—") + '</td><td><span class="badge" style="color:var(--' + escapeHtml(c.face || "UNKNOWN") + ')">' +
+             escapeHtml(c.face || "—") + '</span></td><td class="t">' + escapeHtml(c.text) +
+             (c.attested ? ' <span class="badge" style="color:var(--ok)">sealed</span>' : "") +
+             (c.verified ? "" : ' <span class="badge" style="color:var(--bad)">unverified</span>') + also +
+             '</td><td class="h">' + escapeHtml(c.short) + "</td></tr>";
+    }).join("") || '<tr><td colspan="4" class="muted">' + escapeHtml(d.error || "No claims yet.") + "</td></tr>";
+    var asks = [], seen = {};
+    claims.filter(function (c) { return c.polarity && c.subject; }).forEach(function (c) {
+      if (asks.length < 2 && !seen[c.subject]) { seen[c.subject] = true; asks.push("what is the " + c.subject + "?"); }
+    });
+    asks.push("how did you work that out?");
+    $("suggest").innerHTML = asks.map(function (a) { return '<button type="button" class="sec">' + escapeHtml(a) + "</button>"; }).join("");
+    Array.prototype.forEach.call($("suggest").querySelectorAll("button"), function (b) { b.addEventListener("click", function () { ask(b.textContent); }); });
+  }, function () { return $("claims"); });
+
+  // ledger, filterable by kind (SPEC_V6 §2)
+  var ledgerKind = "";
+  var ledgerPoll = poll("ledger", function () { return "/api/chain?limit=12" + (ledgerKind ? "&kind=" + encodeURIComponent(ledgerKind) : ""); }, 15, function (d) {
+    var kind = ledgerKind;
+      if (!d.available) { $("ledger").innerHTML = '<tr><td colspan="5" class="muted">' + escapeHtml(d.error) + "</td></tr>"; return; }
+      $("ledger-meta").textContent = (kind ? d.matched + " of " : "") + d.total + " entries";
+      $("ledger").innerHTML = d.entries.map(function (e) {
+        var k = e.kind === "lllm.build" ? "lllm" : e.kind;
+        return '<tr><td class="h">' + escapeHtml(e.seq) + '</td><td><span class="badge k-' + escapeHtml(k) + '">' + escapeHtml(e.kind) +
+               '</span></td><td class="t">' + escapeHtml(e.label) + '</td><td class="h">' + escapeHtml(short(e.hash)) +
+               '</td><td class="h">' + (e.prev === GENESIS ? "genesis" : escapeHtml(short(e.prev))) + "</td></tr>";
+      }).join("") || '<tr><td colspan="5" class="muted">No entries of that kind.</td></tr>';
+  }, function () { return $("ledger"); });
+  function loadLedger(kind) { ledgerKind = kind || ""; ledgerPoll.now(); }
+  Array.prototype.forEach.call($("ledger-tabs").querySelectorAll("button"), function (b) {
+    b.addEventListener("click", function () {
+      Array.prototype.forEach.call($("ledger-tabs").querySelectorAll("button"), function (x) { x.classList.toggle("on", x === b); });
+      loadLedger(b.getAttribute("data-kind"));
+    });
+  });
+
+  // query (the Voice)
+  var voiceForm = $("voice"), log = $("voice-log");
+  function cite(text) {
+    return escapeHtml(text).replace(/\[([0-9a-f]{12}(?:, [0-9a-f]{12})*)\]/g, function (_, ids) {
+      return ids.split(", ").map(function (i) { return '<span class="cite">' + i + "</span>"; }).join("");
+    });
+  }
+  function ask(q) {
+    get("/api/voice?" + new URLSearchParams({ q: q }).toString()).then(function (d) {
+      var unknown = d.trace && d.trace.plan === "unknown";
+      var html = '<div class="turn"><div class="q">&gt; ' + escapeHtml(q) + (d.trace ? ' <span class="badge">' + escapeHtml(d.trace.plan) + "</span>" : "") +
+        '</div><div class="a' + (unknown ? " unknown" : "") + '">' + (d.available ? cite(d.reply) : '<span class="error">' + escapeHtml(d.error) + "</span>") + "</div>";
+      if (d.trace_text) { html += "<details><summary>trace</summary><pre>" + escapeHtml(d.trace_text) + "</pre></details>"; }
+      log.innerHTML = html + "</div>" + log.innerHTML;
+    }).catch(fail(log, "Query failed"));
+  }
+  voiceForm.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var q = new FormData(voiceForm).get("q").trim();
+    if (q) { ask(q); voiceForm.reset(); }
+  });
+
+  // field: cool-off while it is down, keep the iframe while it reconnects (SPEC_V8 §4)
+  var fieldN = 0, fieldDown = false;
+  function checkField() {
+    function down(why) {
+      fieldN++; var wait = backoff(fieldN, 2, 30), frame = $("field").querySelector("iframe");
+      fieldDown = true;
+      $("field-meta").textContent = (frame ? "reconnecting" : "offline") + " · retry in " + wait + "s";
+      if (!frame) {
+        $("field").innerHTML = '<div class="body muted">Waiting for SCP Substrate' + (why ? " (" + escapeHtml(why) + ")" : "") +
+          ". Start both with <code>python boot_v3.py</code>, or the Field alone with <code>python ../scp-substrate/serve_v7.py</code>.</div>";
+      }
+      setTimeout(checkField, wait * 1000);
+    }
+    get("/api/field").then(function (d) {
+      if (!d.reachable) { return down(""); }
+      fieldN = 0;
+      var frame = $("field").querySelector("iframe");
+      if (!frame || frame.getAttribute("src") !== d.url) {
+        $("field").innerHTML = '<iframe title="SCP Substrate field" src="' + escapeHtml(d.url) + '"></iframe>';
+      } else if (fieldDown) { frame.src = d.url; }
+      fieldDown = false;
+      $("field-meta").innerHTML = '<a href="' + escapeHtml(d.url) + '" target="_blank" rel="noopener">' + escapeHtml(d.url) + " ↗</a>";
+      setTimeout(checkField, 30000);
+    }).catch(function (e) { down(String(e)); });
+  }
+  checkField();
+
+  // new: entity, subject, claim (SPEC_V14 §1)
+  var nounData = { entities: [], subjects: [] };
+  function opt(value, label) { return '<option value="' + escapeHtml(value) + '">' + escapeHtml(label) + "</option>"; }
+  function named(x) { return x.name + (x.draft ? " (draft)" : ""); }
+  function fillPickers() {
+    var keepE = $("pick-entity").value, keepS = $("pick-subject").value;
+    var ents = nounData.entities, subs = nounData.subjects;
+    $("pick-entity").innerHTML = ents.length
+      ? opt("", "— choose an entity —") + ents.map(function (e) { return opt(e.name, named(e)); }).join("")
+      : opt("", "no entities yet: add one in the Entity tab");
+    $("pick-subject").innerHTML = (subs.length || ents.length)
+      ? opt("", "— choose a subject —") +
+        (subs.length ? '<optgroup label="Subjects">' + subs.map(function (x) {
+          return opt(x.name, named(x) + (x.entities && x.entities.length ? " · " + x.entities.join(", ") : ""));
+        }).join("") + "</optgroup>" : "") +
+        (ents.length ? '<optgroup label="Entities">' + ents.map(function (e) { return opt(e.name, named(e)); }).join("") + "</optgroup>" : "")
+      : opt("", "no subjects yet: add one in the Subject tab");
+    $("pick-entity").value = keepE; $("pick-subject").value = keepS;
+  }
+  function loadNouns() {
+    get("/api/nouns").then(function (d) { nounData = { entities: d.entities || [], subjects: d.subjects || [] }; fillPickers(); })
+      .catch(function () { fillPickers(); });
+  }
+  loadNouns();
+  var newTabs = $("new-tabs"), newForms = { entity: $("new-entity"), subject: $("new-subject"), claim: $("remember") };
+  newTabs.addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-new]"); if (!b) { return; }
+    var which = b.getAttribute("data-new");
+    Array.prototype.forEach.call(newTabs.querySelectorAll("button"), function (x) { x.classList.toggle("on", x === b); });
+    Object.keys(newForms).forEach(function (k) { newForms[k].hidden = k !== which; });
+    $("preview").innerHTML = '<span class="muted">' + (which === "claim" ? "Choose a subject and enter an object to preview." : "Echo previews claims only.") + "</span>";
+  });
+  function saveNoun(kindForm, kind) {
+    kindForm.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var f = new FormData(kindForm), body = { kind: kind, name: String(f.get("name") || "").trim() };
+      if (kind === "subject") { body.entity = String(f.get("entity") || ""); }
+      var btn = kindForm.querySelector("button[type=submit]"); btn.disabled = true;
+      fetch("/api/inbox", { method: "POST", headers: { "Content-Type": "application/json", "X-Forge-Legacy": "1" }, body: JSON.stringify(body) })
+        .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); })
+        .then(function (res) {
+          if (!res.ok) { $("preview").innerHTML = '<span class="error">' + escapeHtml(res.b.error) + "</span>"; return; }
+          $("preview").innerHTML = kv("Draft", res.b.draft_id, "ok-t") + kv(kind === "entity" ? "Entity" : "Subject", body.name + (body.entity ? " → " + body.entity : ""));
+          kindForm.reset(); loadNouns(); loadInbox();
+        }).catch(fail($("preview"), "Save failed")).finally(function () { btn.disabled = false; });
+    });
+  }
+  saveNoun($("new-entity"), "entity");
+  saveNoun($("new-subject"), "subject");
+
+  // new claim + echo
+  var form = $("remember"), timer = null;
+  function fields() { var f = new FormData(form); return { subject: f.get("subject").trim(), object: f.get("object").trim(), face: f.get("face"), text: f.get("text").trim() }; }
+  function echo(e) {
+    if (e.error) { return '<span class="muted">' + escapeHtml(e.error) + "</span>"; }
+    return kv("Keystone Gate", e.gate.passed ? "pass" : "refuse", e.gate.passed ? "ok-t" : "bad-t") +
+      (e.gate.passed ? "" : '<div class="error" style="font-size:12.5px;padding:4px 0">' + escapeHtml(e.gate.reason) + "</div>") +
+      kv("Rules fired", e.rules_fired.length ? e.rules_fired.join(", ") : "none") +
+      kv("Resolves", e.shape.resolves.length) + kv("Introduces", e.shape.introduces);
+  }
+  function preview() {
+    var f = fields(); $("save").disabled = !(f.subject && f.object && f.text);
+    if (!f.subject || !f.object) { return; }
+    get("/api/echo?" + new URLSearchParams(f).toString()).then(function (e) { $("preview").innerHTML = echo(e); }).catch(fail($("preview"), "Echo failed"));
+  }
+  form.addEventListener("input", function () { clearTimeout(timer); timer = setTimeout(preview, 300); });
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault(); $("save").disabled = true;
+    fetch("/api/inbox", { method: "POST", headers: { "Content-Type": "application/json", "X-Forge-Legacy": "1" }, body: JSON.stringify(fields()) })
+      .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); })
+      .then(function (res) {
+        if (!res.ok) { $("preview").innerHTML = '<span class="error">' + escapeHtml(res.b.error) + "</span>"; return; }
+        $("preview").innerHTML = kv("Draft", res.b.draft_id, "ok-t") + echo(res.b.echo); form.reset(); loadInbox(); loadNouns();
+      }).catch(fail($("preview"), "Save failed")).finally(function () { $("save").disabled = false; });
+  });
+  var inboxPoll = poll("drafts", "/api/inbox", 30, function (list) {
+      if (!Array.isArray(list) || !list.length) { $("inbox").innerHTML = ""; return; }
+      $("inbox").innerHTML = '<div style="margin-top:14px;font:11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim)">Pending drafts</div>' +
+        list.map(function (d) {
+          if (d.invalid) { return kv(d.id, "invalid", "bad-t"); }
+          if (d.kind === "entity") { return kv("Entity", d.name); }
+          if (d.kind === "subject") { return kv("Subject", d.name + " → " + d.entity); }
+          return kv(d.face, d.subject + " / " + d.object);
+        }).join("") +
+        '<div style="margin-top:10px;font-size:12.5px;color:var(--muted)">Commit: <code>python forge_cli_v1_7.py inbox commit</code></div>';
+  }, function () { return $("inbox"); });
+  function loadInbox() { inboxPoll.now(); }
+
+  // network
+  poll("network", "/api/nerves", 60, function (d) {
+    if (d.error || !d.available) { state.peers = 0; renderMetrics();
+      $("nerves").innerHTML = '<span class="' + (d.error ? "error" : "muted") + '">' + escapeHtml(d.error || "No SC-OS pins yet.") + "</span>"; return; }
+    var n = d.nerves; state.peers = n.peer_count; renderMetrics();
+    var html = kv("Node", short(n.owner.replace("did:key:", "")) + "…") + kv("Owner anchored", n.owner_pinned ? "yes" : "self-signed");
+    n.peers.forEach(function (p) {
+      var addr = Object.keys(n.addresses).filter(function (a) { return n.addresses[a] === p; })[0];
+      html += kv(addr || "peer", short(p.replace("did:key:", "")) + "…");
+    });
+    $("nerves").innerHTML = html;
+  }, function () { return $("nerves"); });
+
+  // briefing & lllm
+  poll("briefing", "/api/weaver", 300, function (d) {
+    $("weaver").innerHTML = d.briefing ? '<div style="white-space:pre-wrap">' + escapeHtml(d.briefing) + "</div>" : '<span class="muted">' + escapeHtml(d.error || "No briefing yet.") + "</span>";
+  }, function () { return $("weaver"); });
+  poll("lllm", "/api/lllm", 300, function (d) {
+    if (!d.available) { $("lllm").innerHTML = '<span class="muted">' + escapeHtml(d.error) + "</span>"; return; }
+    var html = kv("Build", d.build_id) + kv("Anchored", d.anchored ? "yes" : "on next dream", d.anchored ? "ok-t" : "");
+    (d.warnings || []).forEach(function (w) { html += '<div class="error" style="font-size:12.5px">' + escapeHtml(w) + "</div>"; });
+    $("lllm").innerHTML = html;
+  }, function () { return $("lllm"); });
+})();
+</script>
+</body>
+</html>
