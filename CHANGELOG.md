@@ -4,6 +4,15 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ## [Unreleased]
 
+### Docs 2026-11-18 (no code change)
+
+- `docs/ancestor-the-full-stack.md` and `docs/ancestor/the-full-stack-README.md`:
+  the-full-stack kept as the Legacy's ancestor, reference only (James:
+  "the forge stack was for reference only and not meant to be a layer
+  involved in the legacy program … a doc created or the readme used and
+  stored in docs as an ancestor"). The README is byte-identical to
+  JamesTheGiblet/the-full-stack at 387220b (sha256 33e81191…2a2ac2).
+
 ### Frozen 2026-11-16 (James: "freeze all")
 
 - legacy_v12.py + boot_v7.py 1.10.0 (SPEC_V14.md), with Cockpit
