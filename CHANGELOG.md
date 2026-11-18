@@ -4,6 +4,19 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ## [Unreleased]
 
+### Built 2026-11-18, not frozen (James: "yes do the legacy layer v1.8")
+
+- legacy_v13.py + boot_v8.py + static/projection_v11.html (SPEC_V15.md,
+  1.11.0): the Legacy v12 with the Cockpit moved from v1.7 to v1.8
+  (explorer-d334-forge 1.8.0). New drafts get a created_at after every
+  pending one; /api/inbox and the drafted half of /api/nouns come in the
+  order written; the page's commit hint names forge_cli_v1_8.py. Fixes
+  v1.7's hash order for drafts written in the same millisecond (shown
+  against v12: six drafts posted with the clock frozen came back out of
+  order). test_legacy_v13.py, 5 tests, run red first.
+- Bad: the VPS serves the highest FROZEN boot_vN, so it stays on boot_v7
+  until 1.11.0 is frozen.
+
 ### Docs 2026-11-18 (no code change)
 
 - `docs/ancestor-the-full-stack.md` and `docs/ancestor/the-full-stack-README.md`:
