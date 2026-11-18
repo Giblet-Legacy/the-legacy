@@ -1,24 +1,24 @@
 """
-test_legacy_v13.py — The Legacy v13 (drafts through Cockpit v1.8) test suite
+test_legacy_v1_11.py — The Legacy 1.11.0 (drafts through Cockpit v1.8) test suite
 
 Function:
-    Executable expression of SPEC_V15.md. Written before legacy_v13.py,
-    boot_v8.py and static/projection_v11.html, and run red first.
+    Executable expression of SPEC_V1_11.md. Written before legacy_v1_11.py,
+    boot_v1_11.py and static/projection_v1_11.html, and run red first.
 
 Functions in this file (pytest-collected):
     1. test_inbox_in_the_order_posted
     2. test_nouns_drafts_in_the_order_written
     3. test_posts_and_refusals_as_v12
     4. test_page
-    5. test_boot_v8_order
+    5. test_boot_v1_11_order
 
 Helpers:
     6. home    — FORGE_HOME in tmp_path
-    7. server  — a running Legacy v13
+    7. server  — a running Legacy 1.11.0
     8. _get / _post
 
 Tier:     Tier 1 — Consumer (The Connector)
-Spec:     SPEC_V15.md 1.11.0
+Spec:     SPEC_V1_11.md 1.11.0
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
 """
@@ -38,8 +38,8 @@ if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
 import boot  # noqa: E402
-import boot_v8  # noqa: E402
-import legacy_v13  # noqa: E402
+import boot_v1_11  # noqa: E402
+import legacy_v1_11  # noqa: E402
 
 NOW = 1795036260.646
 
@@ -55,7 +55,7 @@ def home(tmp_path, monkeypatch):
 # 7. server
 @pytest.fixture
 def server(home):
-    srv = legacy_v13.make_server("127.0.0.1", 0)
+    srv = legacy_v1_11.make_server("127.0.0.1", 0)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     yield srv
     srv.shutdown()
@@ -134,8 +134,8 @@ def test_page(server):
         assert needle in page, needle
 
 
-# 5. test_boot_v8_order
-def test_boot_v8_order(monkeypatch):
+# 5. test_boot_v1_11_order
+def test_boot_v1_11_order(monkeypatch):
     seen = []
 
     class Sup:
@@ -151,7 +151,7 @@ def test_boot_v8_order(monkeypatch):
     monkeypatch.setattr(boot, "Supervisor", Sup)
     monkeypatch.setattr(boot, "FIELD_SCRIPT", boot.FIELD_SCRIPT)
     monkeypatch.setattr(boot, "LEGACY_SCRIPT", boot.LEGACY_SCRIPT)
-    assert boot_v8.main(["--port", "1", "--field-port", "2"]) == 0
+    assert boot_v1_11.main(["--port", "1", "--field-port", "2"]) == 0
     field, legacy = seen
     assert field.cmd[1].endswith(os.path.join("scp-substrate", "serve_v8.py"))
-    assert legacy.cmd[1].endswith("legacy_v13.py") and os.path.exists(legacy.cmd[1])
+    assert legacy.cmd[1].endswith("legacy_v1_11.py") and os.path.exists(legacy.cmd[1])

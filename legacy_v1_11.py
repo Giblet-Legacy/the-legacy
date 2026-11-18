@@ -1,17 +1,17 @@
 """
-legacy_v13.py — The Legacy v13: drafts through Cockpit v1.8
+legacy_v1_11.py — The Legacy 1.11.0: drafts through Cockpit v1.8
 
 Function:
-    The entry point from v13 (SPEC_V15.md). The Legacy v12 with the
+    The entry point from 1.11.0 (SPEC_V1_11.md). The Legacy v12 with the
     Cockpit moved from v1.7 to v1.8 (explorer-d334-forge SPEC_V1_8.md):
     drafts are written with a created_at after every pending one, and
     /api/inbox and the drafted half of /api/nouns come in the order the
     drafts were written, not in v1.7's hash order within a millisecond.
-    The page (static/projection_v11.html) names `forge_cli_v1_8.py inbox
+    The page (static/projection_v1_11.html) names `forge_cli_v1_8.py inbox
     commit`. Everything else is v12's. legacy.py and v2-v12 are not edited.
 
-    python boot_v8.py      (the Field v8, then The Legacy v13)
-    python legacy_v13.py [--host 127.0.0.1] [--port 8080]
+    python boot_v1_11.py      (the Field v8, then The Legacy 1.11.0)
+    python legacy_v1_11.py [--host 127.0.0.1] [--port 8080]
 
 Public API:
     1. nouns() -> dict
@@ -25,8 +25,8 @@ Internal helpers:
 
 Tier:     Tier 1 — Consumer (The Connector)
 Depends:  legacy_v12.py (1.10.0), legacy_v4.py (Echo), forge_cli_v1_8 (1.8.0)
-Spec:     SPEC_V15.md 1.11.0
-Version:  1.11.0
+Spec:     SPEC_V1_11.md 1.11.0
+Version:  1.11.0 (frozen 2026-11-18)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
 """
@@ -56,7 +56,7 @@ def _cockpit():
 
 # ---------------------------------------------------------------------------
 # 6. _drafts
-#    v12's _drafts over Cockpit v1.8's pending_drafts (SPEC_V15 §1).
+#    v12's _drafts over Cockpit v1.8's pending_drafts (SPEC_V1_11 §1).
 # ---------------------------------------------------------------------------
 def _drafts():
     cockpit, out = _cockpit(), []
@@ -80,7 +80,7 @@ def pending_drafts():
 
 # ---------------------------------------------------------------------------
 # 1. nouns
-#    SPEC_V15 §1: v12's registered nouns, then drafted ones in the order written.
+#    SPEC_V1_11 §1: v12's registered nouns, then drafted ones in the order written.
 # ---------------------------------------------------------------------------
 def nouns():
     out = _v12.nouns()
@@ -94,13 +94,13 @@ def nouns():
     return out
 
 
-class _LegacyV13Handler(_v12._LegacyV12Handler):
+class _LegacyV1_11Handler(_v12._LegacyV12Handler):
 
     # 3.1 do_GET — the v11 page, /api/nouns and /api/inbox in v1.8 order, else v12.
     def do_GET(self):
         path = urlsplit(self.path).path
         if path in ("/", ""):
-            return self._serve_static("projection_v11.html")
+            return self._serve_static("projection_v1_11.html")
         if path == "/api/nouns":
             return self._send(200, nouns())
         if path == "/api/inbox":
@@ -136,12 +136,12 @@ class _LegacyV13Handler(_v12._LegacyV12Handler):
 # 3. make_server
 # ---------------------------------------------------------------------------
 def make_server(host, port):
-    return ThreadingHTTPServer((host, port), _LegacyV13Handler)
+    return ThreadingHTTPServer((host, port), _LegacyV1_11Handler)
 
 
 # ---------------------------------------------------------------------------
 # 4. main
-#    v10's flags, defaults and exit codes, with v13's server (as v12 does).
+#    v10's flags, defaults and exit codes, with 1.11.0's server (as v12 does).
 # ---------------------------------------------------------------------------
 def main(argv):
     original = _v10.make_server

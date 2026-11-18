@@ -4,18 +4,29 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ## [Unreleased]
 
-### Built 2026-11-18, not frozen (James: "yes do the legacy layer v1.8")
+### Frozen 2026-11-18 (James: "freeze")
 
-- legacy_v13.py + boot_v8.py + static/projection_v11.html (SPEC_V15.md,
+- legacy_v1_11.py + boot_v1_11.py 1.11.0 (SPEC_V1_11.md), with Cockpit
+  forge_cli_v1_8.py 1.8.0. VERSION 1.10.0 -> 1.11.0. Named for the
+  version they ship (roadmap NAMING.md; James: "we need consistency"):
+  built as legacy_v13 / boot_v8 / SPEC_V15 / test_legacy_v13 /
+  projection_v11, renamed before the freeze. The entry below uses the new
+  names. The frozen legacy_v2-v12, boot_v2-v7 and SPEC_V2-V14 keep their
+  counter names until the 2.0.0 consolidation.
+- The VPS's run-latest picked "highest boot_vN with a plain number", so
+  it would never see boot_v1_11.py. run_latest_v2 (forge-vps) picks by
+  the header Version instead.
+
+### Built 2026-11-18 (James: "yes do the legacy layer v1.8")
+
+- legacy_v1_11.py + boot_v1_11.py + static/projection_v1_11.html (SPEC_V1_11.md,
   1.11.0): the Legacy v12 with the Cockpit moved from v1.7 to v1.8
   (explorer-d334-forge 1.8.0). New drafts get a created_at after every
   pending one; /api/inbox and the drafted half of /api/nouns come in the
   order written; the page's commit hint names forge_cli_v1_8.py. Fixes
   v1.7's hash order for drafts written in the same millisecond (shown
   against v12: six drafts posted with the clock frozen came back out of
-  order). test_legacy_v13.py, 5 tests, run red first.
-- Bad: the VPS serves the highest FROZEN boot_vN, so it stays on boot_v7
-  until 1.11.0 is frozen.
+  order). test_legacy_v1_11.py, 5 tests, run red first.
 
 ### Docs 2026-11-18 (no code change)
 
