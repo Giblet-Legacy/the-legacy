@@ -38,6 +38,39 @@ The gate is at `FORGE_AI_GATE_URL` (default `http://127.0.0.1:8092`).
 
 ## 2. The page: `static/projection_v1_12.html`
 
+### 2.1 Views (James: "can we do something about the gui, its very busy now and not very fluid")
+
+The 1.11 page was 13 cards in one scroll, with 9 refreshing all the time.
+1.12 shows **one view at a time**, behind a **left sidebar** (a bottom bar
+on a phone). Every 1.11 card is kept, and only the arrangement changes:
+
+| View | Cards |
+|---|---|
+| 1 Home | **Needs you** (new), Metrics, Briefing |
+| 2 Ask | Ask the AI |
+| 3 Create | New, Echo |
+| 4 Claims | Query, Faces, Claims |
+| 5 Ledger | Ledger |
+| 6 Field | the Field, full height |
+| 7 System | Layers, Network, LLLM |
+
+- **Needs you** lists drafts waiting to be committed and assumptions
+  waiting for a HAL seal, each with its terminal command. "Nothing needs
+  you right now" when clear. Home, Ask and Create carry badges.
+- **Only the open view refreshes.** Health, the cockpit status and the
+  drafts always refresh, because they feed the pills, the metrics and
+  "Needs you". The claims, ledger, network, briefing and LLLM panels
+  wait while hidden. The Field's iframe loads only when the Field view
+  is first opened.
+- Each view has an address (`#home` … `#system`), so the back button and
+  bookmarks work. Keys 1-7 switch views (not while typing). The last
+  view is remembered in this browser.
+- **Ask:** threads down the left (each with counts and the AI's λ).
+  Clicking a thread shows its earlier answers, and clicking one opens
+  it. The scope picker shows only for a new thread. Ctrl+Enter asks.
+
+### 2.2 The AI card
+
 The 1.11 page with one card, **Ask the AI** (`id="ai-card"`):
 
 - a **thread** (typed, or picked from the existing ones), a **scope**

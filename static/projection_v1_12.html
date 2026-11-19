@@ -1,6 +1,8 @@
 <!doctype html>
 <!--
-  projection_v1_12.html — The Legacy 1.12.0 page (SPEC_V1_12.md §2): projection_v1_11.html with an
+  projection_v1_12.html — The Legacy 1.12.0 page (SPEC_V1_12.md §2): projection_v1_11.html arranged
+  into seven views behind a sidebar (Home, Ask, Create, Claims, Ledger, Field, System; a bottom bar
+  on a phone), Home led by "Needs you", only the open view refreshing, keys 1-7, and an
   "Ask the AI" card. It asks through the Legacy's /api/ai/* relay to ai-gate, which is the only
   process that talks to the model. Every answer is shown as an ASSUMPTION with its status, conflicts,
   open questions and a 1-5 rating; approving it is a HAL seal in the terminal (seal_command). The
@@ -198,6 +200,55 @@
     table:has(#claims) tr > :nth-child(4), table:has(#ledger) tr > :nth-child(n+4) { display: none; }
     #claims td.h:first-child { white-space: normal; overflow-wrap: anywhere; }
   }
+
+  /* 1.12: views behind a sidebar (SPEC_V1_12 §2.1) */
+  main { max-width: none; display: block; padding: 24px 24px 32px 224px; }
+  .view { display: none; max-width: 1180px; margin: 0 auto; gap: 16px; grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .view.on { display: grid; }
+  .view > h1 { grid-column: span 12; margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
+  .view > h1 .sub { font: 12px var(--mono); color: var(--dim); font-weight: 400; margin-left: 10px; }
+  .side { position: fixed; z-index: 6; top: 0; bottom: 0; left: 0; width: 200px; padding: 14px 10px;
+          background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 2px; }
+  .side .brand { padding: 4px 8px 16px; }
+  .side a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; color: var(--muted); font-size: 13.5px; }
+  .side a:hover { background: var(--surface2); color: var(--text); text-decoration: none; }
+  .side a.on { background: var(--accent-soft); color: var(--text); }
+  .side .key { font: 11px var(--mono); color: var(--dim); width: 12px; }
+  .side .badge { margin-left: auto; min-width: 20px; text-align: center; padding: 0 6px; border-radius: 999px;
+                 background: var(--warn); color: #000; font: 600 11px/18px var(--mono); }
+  .side .badge:empty { display: none; }
+  .side .foot { margin-top: auto; padding: 8px; font: 11px/1.5 var(--mono); color: var(--dim); }
+  .topbar { padding-left: 224px; }
+  .topbar .brand { display: none; }
+  #view-field iframe { height: calc(100vh - 200px); min-height: 420px; }
+  .needs { display: grid; gap: 8px; }
+  .need { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 10px 12px; border: 1px solid var(--border);
+          border-radius: var(--r); background: var(--surface2); }
+  .need .n { font: 600 18px var(--mono); color: var(--warn); min-width: 28px; }
+  .need .w { flex: 1; min-width: 180px; }
+  .need.clear .n { color: var(--ok); }
+  .ai-layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 20px; }
+  .ai-threads a { display: block; padding: 8px 10px; border-radius: 6px; color: var(--text); border: 1px solid transparent; margin-bottom: 4px; }
+  .ai-threads a:hover { background: var(--surface2); text-decoration: none; }
+  .ai-threads a.on { border-color: var(--accent); background: var(--accent-soft); }
+  .ai-threads .c { display: block; font: 11px var(--mono); color: var(--dim); }
+  .ai-item { display: block; width: 100%; text-align: left; margin-top: 6px; }
+  #ai-form label { align-content: start; }
+  .card > header { flex-wrap: wrap; row-gap: 4px; }
+  @media (max-width: 760px) {
+    main { padding: 16px 16px 88px; }
+    .topbar { padding-left: 16px; }
+    .topbar .brand { display: flex; }
+    .side { top: auto; right: 0; width: auto; height: 64px; flex-direction: row; justify-content: space-around;
+            padding: 6px; border-right: 0; border-top: 1px solid var(--border); }
+    .side .brand, .side .foot, .side .key { display: none; }
+    html, body { overflow-x: hidden; }
+    .side a { position: relative; flex: 1 1 0; min-width: 0; justify-content: center; padding: 6px 0; font-size: 10.5px; }
+    .pills { margin-left: 0; }
+    .view > h1 .sub { display: none; }
+    .side .badge { position: absolute; top: 0; right: -4px; margin: 0; }
+    .ai-layout { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -206,50 +257,61 @@
   <div class="pills" id="pills"><span class="pill"><span class="dot"></span>loading</span></div>
 </div>
 
+<nav class="side" id="side" aria-label="Views">
+  <div class="brand"><span class="mark">L</span>The Legacy</div>
+  <a href="#home" data-view="home"><span class="key">1</span>Home<span class="badge" id="badge-home"></span></a>
+  <a href="#ask" data-view="ask"><span class="key">2</span>Ask<span class="badge" id="badge-ask"></span></a>
+  <a href="#create" data-view="create"><span class="key">3</span>Create<span class="badge" id="badge-create"></span></a>
+  <a href="#claims" data-view="claims"><span class="key">4</span>Claims</a>
+  <a href="#ledger" data-view="ledger"><span class="key">5</span>Ledger</a>
+  <a href="#field" data-view="field"><span class="key">6</span>Field</a>
+  <a href="#system" data-view="system"><span class="key">7</span>System</a>
+  <div class="foot">keys 1-7 switch views<br>local-first · signed</div>
+</nav>
+
 <main>
+<div class="view" id="view-home" data-view="home">
+  <h1>Home<span class="sub">what needs you, at a glance</span></h1>
+  <section class="card span-12" aria-labelledby="needs-h">
+    <header><h2 id="needs-h">Needs you</h2><span class="meta">done in the terminal · nothing here acts on its own</span></header>
+    <div class="body"><div class="needs" id="needs"><span class="muted">Checking…</span></div></div>
+  </section>
   <section class="card span-12" aria-labelledby="metrics-h">
     <header><h2 id="metrics-h">Metrics</h2><span class="meta" id="clock"></span> <span id="fresh"></span></header>
     <div class="metrics" id="metrics"></div>
   </section>
-
-  <section class="card span-7" aria-labelledby="layers-h">
-    <header><h2 id="layers-h">Layers</h2><span class="meta" id="layers-meta"></span></header>
-    <div class="body"><div class="layers" id="layers"></div></div>
+  <section class="card span-12" aria-labelledby="brief-h">
+    <header><h2 id="brief-h">Briefing</h2><span class="meta">the Weaver</span></header>
+    <div class="body" id="weaver"><span class="muted">Loading…</span></div>
   </section>
-
-  <section class="card span-5" aria-labelledby="faces-h">
-    <header><h2 id="faces-h">Faces filled</h2><span class="meta" id="faces-meta"></span></header>
-    <div class="body"><div class="stack" id="stack"></div><div class="legend" id="legend"></div></div>
-  </section>
-
-  <section class="card span-12" aria-labelledby="query-h">
-    <header><h2 id="query-h">Query</h2><span class="meta">the Voice · answers only from FACT, COUNTER and CONTEXT claims</span></header>
-    <div class="body">
-      <form id="voice" class="console" autocomplete="off">
-        <label class="in" aria-label="Query"><span>&gt;</span><input name="q" maxlength="2000" required placeholder="is the sky blue?"></label>
-        <button type="submit">Run</button>
-      </form>
-      <div class="chips" id="suggest"></div>
-      <div class="log" id="voice-log"></div>
+</div>
+<div class="view" id="view-ask" data-view="ask">
+  <h1>Ask<span class="sub">the AI, through the gate</span></h1>
+  <section class="card span-12" id="ai-card" aria-labelledby="ai-h">
+    <header><h2 id="ai-h">Ask the AI</h2><span class="meta" id="ai-meta">through ai-gate · every answer is an ASSUMPTION until you seal it</span></header>
+    <div class="body ai-layout">
+      <div>
+        <div class="meta" style="margin-bottom:6px">Threads</div>
+        <div id="ai-threads" class="ai-threads"><span class="muted">Loading…</span></div>
+        <button type="button" class="sec" id="ai-new" style="margin-top:6px">+ New thread</button>
+      </div>
+      <div>
+        <form id="ai-form" class="grid" autocomplete="off">
+          <label>Thread<input name="topic" id="ai-topic" list="ai-topics" maxlength="60" required placeholder="noir" pattern="[a-z0-9][a-z0-9-]*"></label>
+          <datalist id="ai-topics"></datalist>
+          <label id="ai-about-l">Scope (for a new thread)<select id="ai-about" multiple size="3"></select></label>
+          <label class="full">Idea<textarea name="idea" id="ai-idea" maxlength="4000" required placeholder="What would he do at dawn?"></textarea></label>
+          <div class="full"><button type="submit" id="ai-ask">Ask</button> <span id="ai-status" class="muted"></span>
+            <span class="muted" style="float:right;font-size:12px">Ctrl+Enter asks</span></div>
+        </form>
+        <div id="ai-answer"></div>
+        <div id="ai-history" style="margin-top:14px"></div>
+      </div>
     </div>
   </section>
-
-  <section class="card span-12" aria-labelledby="claims-h">
-    <header><h2 id="claims-h">Claims</h2><span class="meta" id="claims-meta"></span></header>
-    <div class="tbl"><table><thead><tr><th>Subject</th><th>Face</th><th>Claim</th><th>ID</th></tr></thead><tbody id="claims"></tbody></table></div>
-  </section>
-
-  <section class="card span-12" aria-labelledby="ledger-h">
-    <header><h2 id="ledger-h">Ledger</h2><span class="tabs" id="ledger-tabs"><button type="button" class="sec on" data-kind="">All</button><button type="button" class="sec" data-kind="claim">Claims</button><button type="button" class="sec" data-kind="seal">Seals</button><button type="button" class="sec" data-kind="proposal">Proposals</button></span><span class="meta" id="ledger-meta"></span></header>
-    <div class="tbl"><table><thead><tr><th>Seq</th><th>Kind</th><th>Entry</th><th>Hash</th><th>Prev</th></tr></thead>
-      <tbody id="ledger"></tbody></table></div>
-  </section>
-
-  <section class="card span-12" aria-labelledby="field-h">
-    <header><h2 id="field-h">Field</h2><span class="meta" id="field-meta"></span></header>
-    <div id="field"><div class="body muted">Checking SCP Substrate…</div></div>
-  </section>
-
+</div>
+<div class="view" id="view-create" data-view="create">
+  <h1>Create<span class="sub">drafts, signed in the terminal</span></h1>
   <section class="card span-7" aria-labelledby="new-h">
     <header><h2 id="new-h">New</h2><span class="tabs" id="new-tabs"><button type="button" class="sec" data-new="entity">Entity</button><button type="button" class="sec" data-new="subject">Subject</button><button type="button" class="sec on" data-new="claim">Claim</button></span><span class="meta">saved as a draft · signed in the terminal</span></header>
     <div class="body">
@@ -273,46 +335,111 @@
       </form>
     </div>
   </section>
-
   <section class="card span-5" aria-labelledby="echo-h">
     <header><h2 id="echo-h">Echo</h2><span class="meta">what committing it would do</span></header>
     <div class="body"><div id="preview" class="muted">Enter a subject and object to preview.</div><div id="inbox"></div></div>
   </section>
-
-
-  <section class="card span-12" id="ai-card" aria-labelledby="ai-h">
-    <header><h2 id="ai-h">Ask the AI</h2><span class="meta" id="ai-meta">through ai-gate · every answer is an ASSUMPTION until you seal it</span></header>
+</div>
+<div class="view" id="view-claims" data-view="claims">
+  <h1>Claims<span class="sub">what you hold, by face</span></h1>
+  <section class="card span-12" aria-labelledby="query-h">
+    <header><h2 id="query-h">Query</h2><span class="meta">the Voice · answers only from FACT, COUNTER and CONTEXT claims</span></header>
     <div class="body">
-      <form id="ai-form" class="grid" autocomplete="off">
-        <label>Thread<input name="topic" id="ai-topic" list="ai-topics" maxlength="60" required placeholder="noir" pattern="[a-z0-9][a-z0-9-]*"></label>
-        <datalist id="ai-topics"></datalist>
-        <label>Scope (needed for a new thread)<select id="ai-about" multiple size="4"></select></label>
-        <label class="full">Idea<textarea name="idea" id="ai-idea" maxlength="4000" required placeholder="What would he do at dawn?"></textarea></label>
-        <div class="full"><button type="submit" id="ai-ask">Ask</button> <span id="ai-status" class="muted"></span></div>
+      <form id="voice" class="console" autocomplete="off">
+        <label class="in" aria-label="Query"><span>&gt;</span><input name="q" maxlength="2000" required placeholder="is the sky blue?"></label>
+        <button type="submit">Run</button>
       </form>
-      <div id="ai-answer"></div>
-      <div id="ai-threads" class="muted" style="margin-top:12px;font-size:12.5px"></div>
+      <div class="chips" id="suggest"></div>
+      <div class="log" id="voice-log"></div>
     </div>
   </section>
-
-  <section class="card span-4" aria-labelledby="net-h">
+  <section class="card span-12" aria-labelledby="faces-h">
+    <header><h2 id="faces-h">Faces filled</h2><span class="meta" id="faces-meta"></span></header>
+    <div class="body"><div class="stack" id="stack"></div><div class="legend" id="legend"></div></div>
+  </section>
+  <section class="card span-12" aria-labelledby="claims-h">
+    <header><h2 id="claims-h">Claims</h2><span class="meta" id="claims-meta"></span></header>
+    <div class="tbl"><table><thead><tr><th>Subject</th><th>Face</th><th>Claim</th><th>ID</th></tr></thead><tbody id="claims"></tbody></table></div>
+  </section>
+</div>
+<div class="view" id="view-ledger" data-view="ledger">
+  <h1>Ledger<span class="sub">the hash chain</span></h1>
+  <section class="card span-12" aria-labelledby="ledger-h">
+    <header><h2 id="ledger-h">Ledger</h2><span class="tabs" id="ledger-tabs"><button type="button" class="sec on" data-kind="">All</button><button type="button" class="sec" data-kind="claim">Claims</button><button type="button" class="sec" data-kind="seal">Seals</button><button type="button" class="sec" data-kind="proposal">Proposals</button></span><span class="meta" id="ledger-meta"></span></header>
+    <div class="tbl"><table><thead><tr><th>Seq</th><th>Kind</th><th>Entry</th><th>Hash</th><th>Prev</th></tr></thead>
+      <tbody id="ledger"></tbody></table></div>
+  </section>
+</div>
+<div class="view" id="view-field" data-view="field">
+  <h1>Field<span class="sub">SCP Substrate</span></h1>
+  <section class="card span-12" aria-labelledby="field-h">
+    <header><h2 id="field-h">Field</h2><span class="meta" id="field-meta"></span></header>
+    <div id="field"><div class="body muted">Checking SCP Substrate…</div></div>
+  </section>
+</div>
+<div class="view" id="view-system" data-view="system">
+  <h1>System<span class="sub">layers, network, LLLM</span></h1>
+  <section class="card span-12" aria-labelledby="layers-h">
+    <header><h2 id="layers-h">Layers</h2><span class="meta" id="layers-meta"></span></header>
+    <div class="body"><div class="layers" id="layers"></div></div>
+  </section>
+  <section class="card span-6" aria-labelledby="net-h">
     <header><h2 id="net-h">Network</h2><span class="meta">SC-OS pins</span></header>
     <div class="body" id="nerves"><span class="muted">Loading…</span></div>
   </section>
-
-  <section class="card span-4" aria-labelledby="brief-h">
-    <header><h2 id="brief-h">Briefing</h2><span class="meta">the Weaver</span></header>
-    <div class="body" id="weaver"><span class="muted">Loading…</span></div>
-  </section>
-
-  <section class="card span-4" aria-labelledby="lllm-h">
+  <section class="card span-6" aria-labelledby="lllm-h">
     <header><h2 id="lllm-h">LLLM</h2><span class="meta">build provenance</span></header>
     <div class="body" id="lllm"><span class="muted">Loading…</span></div>
   </section>
-
+</div>
   <footer><span>local-first · signed · read-only except drafts</span><span>Giblets Forge · now forge yours</span></footer>
 </main>
 
+<script>
+/* Views, the sidebar, "Needs you" and badges (SPEC_V1_12 §2.1). */
+(function () {
+  "use strict";
+  var VIEWS = ["home", "ask", "create", "claims", "ledger", "field", "system"];
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function show(v) {
+    if (VIEWS.indexOf(v) < 0) { v = "home"; }
+    window.__legacyView = v;
+    Array.prototype.forEach.call(document.querySelectorAll(".view"), function (el) { el.classList.toggle("on", el.getAttribute("data-view") === v); });
+    Array.prototype.forEach.call(document.querySelectorAll(".side a"), function (a) { a.classList.toggle("on", a.getAttribute("data-view") === v); });
+    try { localStorage.setItem("legacy.view", v); } catch (e) { /* private window */ }
+    if (location.hash !== "#" + v) { history.replaceState(null, "", "#" + v); }
+    document.title = v.charAt(0).toUpperCase() + v.slice(1) + " · The Legacy";
+    document.dispatchEvent(new Event("legacy:view"));
+  }
+  window.addEventListener("hashchange", function () { show(location.hash.slice(1)); });
+  document.addEventListener("keydown", function (e) {
+    var t = e.target && e.target.tagName;
+    if (e.ctrlKey || e.metaKey || e.altKey || t === "INPUT" || t === "TEXTAREA" || t === "SELECT") { return; }
+    var n = parseInt(e.key, 10);
+    if (n >= 1 && n <= VIEWS.length) { location.hash = VIEWS[n - 1]; }
+  });
+  var stored = null;
+  try { stored = localStorage.getItem("legacy.view"); } catch (e) { stored = null; }
+  show(location.hash.slice(1) || stored || "home");
+
+  function renderNeeds() {
+    var drafts = window.__legacyDrafts, ai = window.__legacyAIPending, items = [];
+    if (drafts > 0) { items.push({ n: drafts, w: "draft" + (drafts === 1 ? "" : "s") + " waiting to be committed", cmd: "python forge_cli_v1_8.py inbox commit", v: "create" }); }
+    if (ai > 0) { items.push({ n: ai, w: "assumption" + (ai === 1 ? "" : "s") + " to approve or refuse (HAL)", cmd: "python ai_gate.py seal <id> approve --lambda 1.0", v: "ask" }); }
+    $("needs").innerHTML = items.length ? items.map(function (x) {
+      return '<div class="need"><span class="n">' + x.n + '</span><span class="w">' + esc(x.w) + ' · <a href="#' + x.v + '">open ' + x.v + "</a></span><code>" + esc(x.cmd) + "</code></div>";
+    }).join("") : (drafts === undefined && ai === undefined ? '<span class="muted">Checking…</span>'
+      : '<div class="need clear"><span class="n">0</span><span class="w">Nothing needs you right now.</span></div>');
+    $("badge-create").textContent = drafts > 0 ? drafts : "";
+    $("badge-ask").textContent = ai > 0 ? ai : "";
+    var total = (drafts > 0 ? drafts : 0) + (ai > 0 ? ai : 0);
+    $("badge-home").textContent = total > 0 ? total : "";
+  }
+  document.addEventListener("legacy:needs", renderNeeds);
+})();
+</script>
 <script>
 (function () {
   "use strict";
@@ -349,6 +476,8 @@
       metric("Ledger", s.ledger.entries, s.ledger.self_consistent ? "chain verified (P6)" : "not verified") +
       metric("Drafts", s.inbox.pending, s.inbox.done + " committed · " + s.inbox.refused + " refused") +
       metric("Peers", state.peers === null ? "—" : state.peers, "pinned via SC-OS");
+    window.__legacyDrafts = s.inbox.pending;
+    document.dispatchEvent(new Event("legacy:needs"));
   }
 
   // refresh with exponential cool-off; each panel keeps its last good data (SPEC_V8 §4)
@@ -359,10 +488,15 @@
     $("fresh").innerHTML = names.length ? pill("stale: " + names.join(", ") + " · retrying", "bad")
       : pill("live · " + new Date().toTimeString().slice(0, 8), "ok");
   }
+  // 1.12: which view each panel belongs to; unlisted panels (health, status, drafts) feed the
+  // pills, metrics and "Needs you", so they always refresh. The others wait while hidden.
+  var POLL_VIEW = { claims: "claims", ledger: "ledger", network: "system", briefing: "home", lllm: "system" };
+  function shown(name) { var v = POLL_VIEW[name]; return !v || window.__legacyView === v; }
   function poll(name, path, every, render, el) {
     var n = 0, timer = null;
     function tick() {
       clearTimeout(timer);
+      if (!shown(name)) { timer = setTimeout(tick, 1000); return; }
       get(typeof path === "function" ? path() : path).then(function (d) {
         var soft = d && d.stale;
         if (!soft) { buffers[name] = d; }
@@ -487,6 +621,7 @@
   // field: cool-off while it is down, keep the iframe while it reconnects (SPEC_V8 §4)
   var fieldN = 0, fieldDown = false;
   function checkField() {
+    if (window.__legacyView !== "field") { setTimeout(checkField, 1000); return; }  // 1.12: loaded only when opened
     function down(why) {
       fieldN++; var wait = backoff(fieldN, 2, 30), frame = $("field").querySelector("iframe");
       fieldDown = true;
@@ -626,8 +761,8 @@
 </script>
 
 <script>
-/* The AI card (SPEC_V1_12 §2). Its own scope: it reads /api/ai/* and /api/nouns, and writes only
-   /api/ai/ask and /api/ai/rate, which the Legacy guards and relays to ai-gate. */
+/* The AI card (SPEC_V1_12 §2.2). Reads /api/ai/* and /api/nouns; writes only /api/ai/ask and
+   /api/ai/rate, which the Legacy guards and relays to ai-gate. Never seals. */
 (function () {
   "use strict";
   function $(id) { return document.getElementById(id); }
@@ -640,25 +775,49 @@
       .then(function (r) { return r.json().then(function (d) { return { status: r.status, data: d }; }); });
   }
   function scoreText(s) {
-    if (!s || s.lambda == null) { return "AI λ: unrated"; }
-    return "AI λ: " + Number(s.lambda).toFixed(2) + " " + s.tier + " (" + s.ratings + " rating" + (s.ratings === 1 ? "" : "s") + ")";
+    if (!s || s.lambda == null) { return "AI λ unrated"; }
+    return "AI λ " + Number(s.lambda).toFixed(2) + " " + s.tier;
+  }
+  var current = null, known = [];
+  function setThread(topic) {
+    current = topic;
+    $("ai-topic").value = topic || "";
+    $("ai-about-l").style.display = topic && known.indexOf(topic) >= 0 ? "none" : "";
+    Array.prototype.forEach.call(document.querySelectorAll("#ai-threads a"), function (a) { a.classList.toggle("on", a.getAttribute("data-topic") === topic); });
+    loadHistory();
   }
   function loadThreads() {
     getJ("/api/ai/threads").then(function (list) {
       if (!Array.isArray(list)) {
         $("ai-ask").disabled = true;
-        $("ai-threads").textContent = (list && list.error) || "ai-gate did not answer";
+        $("ai-threads").innerHTML = '<span class="error">' + esc((list && list.error) || "ai-gate did not answer") + "</span>";
         return;
       }
       $("ai-ask").disabled = false;
+      known = list.map(function (t) { return t.topic; });
+      var pending = 0;
+      list.forEach(function (t) { pending += (t.counts && t.counts.pending) || 0; });
+      window.__legacyAIPending = pending;
+      document.dispatchEvent(new Event("legacy:needs"));
       $("ai-topics").innerHTML = list.map(function (t) { return '<option value="' + esc(t.topic) + '">'; }).join("");
       $("ai-threads").innerHTML = list.length ? list.map(function (t) {
         var c = t.counts || {};
-        return "<div><b>" + esc(t.topic) + "</b> · scope " + esc((t.about || []).join(", ")) + " · " +
-          (c.pending || 0) + " pending, " + (c.approved || 0) + " approved, " + (c.refused || 0) + " refused · " +
-          esc(scoreText(t.score)) + "</div>";
-      }).join("") : "No threads yet: give a new thread a name and a scope.";
-    }).catch(function () { $("ai-threads").textContent = "ai-gate did not answer"; });
+        return '<a href="#ask" data-topic="' + esc(t.topic) + '"' + (t.topic === current ? ' class="on"' : "") + ">" + esc(t.topic) +
+          '<span class="c">' + (c.pending || 0) + " pending · " + (c.approved || 0) + " approved · " + esc(scoreText(t.score)) + "</span></a>";
+      }).join("") : '<span class="muted">No threads yet.</span>';
+      if (current === null && list.length) { setThread(list[0].topic); }
+    }).catch(function () { $("ai-threads").innerHTML = '<span class="error">ai-gate did not answer</span>'; });
+  }
+  function loadHistory() {
+    if (!current || known.indexOf(current) < 0) { $("ai-history").innerHTML = ""; return; }
+    getJ("/api/ai/assumptions?topic=" + encodeURIComponent(current)).then(function (rows) {
+      if (!Array.isArray(rows) || !rows.length) { $("ai-history").innerHTML = ""; return; }
+      $("ai-history").innerHTML = '<div class="meta" style="margin-bottom:4px">Earlier in ' + esc(current) + "</div>" +
+        rows.slice().reverse().map(function (a) {
+          return '<button type="button" class="sec ai-item" data-open="' + esc(a.id) + '">' + esc(a.status) + " · " +
+            (a.conflicts && a.conflicts.length ? "! " : "") + esc(a.idea.slice(0, 90)) + (a.rating ? " · rated " + a.rating : "") + "</button>";
+        }).join("");
+    });
   }
   function loadScope() {
     getJ("/api/nouns").then(function (d) {
@@ -670,38 +829,59 @@
     }).catch(function () {});
   }
   function render(a) {
-    var html = '<div style="margin-top:14px;padding:12px;border:1px solid var(--line, #444);border-radius:8px">' +
-      '<div class="meta" style="letter-spacing:.06em">ASSUMPTION · <b>' + esc(a.status) + "</b> · thread " + esc(a.topic) +
+    var html = '<div style="margin-top:14px;padding:12px;border:1px solid var(--border2);border-radius:8px">' +
+      '<div class="meta" style="letter-spacing:.06em">ASSUMPTION · <b>' + esc(a.status) + "</b> · " + esc(a.topic) +
       " · " + esc(a.model) + " · " + esc(a.id) + "</div>" +
+      '<div style="margin:8px 0 0;color:var(--muted)">' + esc(a.idea) + "</div>" +
       '<p style="white-space:pre-wrap;margin:10px 0">' + esc(a.text) + "</p>";
     if (a.builds_on && a.builds_on.length) { html += '<div class="muted">builds on ' + esc(a.builds_on.join(", ")) + "</div>"; }
-    (a.conflicts || []).forEach(function (c) { html += '<div style="color:var(--warn, #d9a441)">! conflicts with ' + esc(c.ref) + ": " + esc(c.why) + "</div>"; });
+    (a.conflicts || []).forEach(function (c) { html += '<div style="color:var(--warn)">! conflicts with ' + esc(c.ref) + ": " + esc(c.why) + "</div>"; });
     (a.open_questions || []).forEach(function (q) { html += "<div>? " + esc(q) + "</div>"; });
-    html += '<div style="margin-top:10px">Rate: ' + [1, 2, 3, 4, 5].map(function (n) {
-      return '<button type="button" class="sec" data-rate="' + n + '" data-id="' + esc(a.id) + '">' + n + "</button>";
+    html += '<div style="margin-top:10px">Rate ' + [1, 2, 3, 4, 5].map(function (n) {
+      return '<button type="button" class="sec' + (a.rating === n ? " on" : "") + '" data-rate="' + n + '" data-id="' + esc(a.id) + '">' + n + "</button>";
     }).join(" ") + ' <span id="ai-score" class="muted"></span></div>' +
       '<div class="muted" style="margin-top:8px">Approve or refuse in the terminal (HAL seal): <code>' + esc(a.seal_command) + "</code></div></div>";
     $("ai-answer").innerHTML = html;
   }
+  $("ai-threads").addEventListener("click", function (e) {
+    var a = e.target.closest ? e.target.closest("a[data-topic]") : null;
+    if (a) { e.preventDefault(); setThread(a.getAttribute("data-topic")); $("ai-answer").innerHTML = ""; $("ai-idea").focus(); }
+  });
+  $("ai-new").addEventListener("click", function () { setThread(null); $("ai-answer").innerHTML = ""; $("ai-topic").focus(); });
+  $("ai-topic").addEventListener("input", function () {
+    var t = $("ai-topic").value.trim();
+    $("ai-about-l").style.display = known.indexOf(t) >= 0 ? "none" : "";
+  });
+  $("ai-idea").addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); $("ai-form").requestSubmit(); }
+  });
   $("ai-form").addEventListener("submit", function (e) {
     e.preventDefault();
+    var topic = $("ai-topic").value.trim();
     var about = Array.prototype.slice.call($("ai-about").selectedOptions).map(function (o) { return o.value; });
-    var body = { idea: $("ai-idea").value, topic: $("ai-topic").value.trim(), lllm: true };
-    if (about.length) { body.about = about; }
+    var body = { idea: $("ai-idea").value, topic: topic, lllm: true };
+    if (about.length && known.indexOf(topic) < 0) { body.about = about; }
     $("ai-ask").disabled = true;
     $("ai-status").textContent = "asking through the gate…";
     postJ("/api/ai/ask", body).then(function (r) {
       $("ai-ask").disabled = false;
-      if (r.status === 201) { $("ai-status").textContent = ""; render(r.data); loadThreads(); }
-      else { $("ai-status").textContent = (r.data && r.data.error) || ("refused (" + r.status + ")"); }
+      if (r.status === 201) {
+        $("ai-status").textContent = ""; $("ai-idea").value = "";
+        render(r.data); current = topic; loadThreads(); loadHistory();
+      } else { $("ai-status").textContent = (r.data && r.data.error) || ("refused (" + r.status + ")"); }
     }).catch(function () { $("ai-ask").disabled = false; $("ai-status").textContent = "the Legacy did not answer"; });
+  });
+  $("ai-history").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("button[data-open]") : null;
+    if (b) { getJ("/api/ai/assumption?id=" + encodeURIComponent(b.getAttribute("data-open"))).then(render); }
   });
   $("ai-answer").addEventListener("click", function (e) {
     var b = e.target.closest ? e.target.closest("button[data-rate]") : null;
     if (!b) { return; }
     postJ("/api/ai/rate", { id: b.getAttribute("data-id"), rating: Number(b.getAttribute("data-rate")) }).then(function (r) {
       $("ai-score").textContent = r.status === 201 ? "rated " + r.data.rating + " · " + scoreText(r.data.score) : ((r.data && r.data.error) || "not rated");
-      loadThreads();
+      Array.prototype.forEach.call(document.querySelectorAll("#ai-answer button[data-rate]"), function (x) { x.classList.toggle("on", x === b); });
+      loadThreads(); loadHistory();
     });
   });
   loadThreads();

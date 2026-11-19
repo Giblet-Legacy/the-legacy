@@ -16,6 +16,14 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
   - test_legacy_v1_12.py: 8 tests, red first.
   - Smoke-tested on spare ports against the real forge.db: the relay works, and an
     ask without GEMINI_API_KEY is refused with that message.
+- The page as seven views behind a sidebar (SPEC_V1_12 §2.1; James: "its very busy now
+  and not very fluid"):
+  - Home leads with "Needs you", with badges on Home, Ask and Create;
+  - only the open view refreshes, and the Field loads when first opened;
+  - keys 1-7, addresses #home … #system, and the last view remembered;
+  - Ask has threads on the left and its history.
+  Every 1.11 card is kept. Checked in headless Edge at desktop and phone widths (no
+  horizontal overflow). test_legacy_v1_12.py: 9 tests.
 - Bad: no real Gemini answer has been seen yet. That needs James's key and model id.
 
 ### Frozen 2026-11-18 (James: "freeze")

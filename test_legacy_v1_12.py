@@ -174,6 +174,26 @@ def test_page_has_the_ai_card(server):
         assert needle in page, needle
 
 
+# 6b
+def test_page_is_seven_views_behind_a_sidebar(server):
+    """SPEC_V1_12 §2.1 (James: "its very busy now and not very fluid"): one view at a time."""
+    import re
+    page = _get(server, "/")[1]
+    views = re.findall(r'class="view" id="view-([a-z]+)" data-view="\1"', page)
+    assert views == ["home", "ask", "create", "claims", "ledger", "field", "system"]
+    for v in views:
+        assert f'href="#{v}" data-view="{v}"' in page, v
+    assert 'id="needs"' in page and page.index('id="needs"') < page.index('id="metrics"')  # Home leads with it
+    for b in ("badge-home", "badge-ask", "badge-create"):
+        assert f'id="{b}"' in page
+    assert page.count('<section class="card') == 14  # every 1.11 card kept, plus Needs you
+    for card in ("metrics-h", "layers-h", "faces-h", "query-h", "claims-h", "ledger-h", "field-h", "new-h",
+                 "echo-h", "ai-h", "net-h", "brief-h", "lllm-h", "needs-h"):
+        assert f'aria-labelledby="{card}"' in page, card
+    assert "if (!shown(name))" in page and 'window.__legacyView !== "field"' in page  # hidden views wait
+    assert page.index("legacy.view") < page.index("function poll(")  # the view is known before panels poll
+
+
 # 7
 def test_boot_v1_12_starts_field_gate_legacy(monkeypatch):
     seen = []
