@@ -4,6 +4,20 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ## [Unreleased]
 
+### Built 2026-11-19, not frozen (James: "now lets integrate the ai into our interface")
+
+- legacy_v1_12.py + boot_v1_12.py + static/projection_v1_12.html (SPEC_V1_12.md,
+  1.12.0-dev): an "Ask the AI" card.
+  - The Legacy relays /api/ai/* to ai-gate's local API (ai_gate_serve.py): reads
+    from an allowlist only; asks and ratings behind the v4 guard; no seal relay.
+  - Every answer is shown as an ASSUMPTION with its status, conflicts and open
+    questions, a 1-5 rating, the AI's λ, and the terminal seal command.
+  - boot_v1_12 starts the Field, ai-gate and the Legacy.
+  - test_legacy_v1_12.py: 8 tests, red first.
+  - Smoke-tested on spare ports against the real forge.db: the relay works, and an
+    ask without GEMINI_API_KEY is refused with that message.
+- Bad: no real Gemini answer has been seen yet. That needs James's key and model id.
+
 ### Frozen 2026-11-18 (James: "freeze")
 
 - legacy_v1_11.py + boot_v1_11.py 1.11.0 (SPEC_V1_11.md), with Cockpit
