@@ -24,6 +24,14 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
   - Ask has threads on the left and its history.
   Every 1.11 card is kept. Checked in headless Edge at desktop and phone widths (no
   horizontal overflow). test_legacy_v1_12.py: 9 tests.
+- Claims merged into Ask (James: "should ask and claim be the same thing … pull claims and generate
+  reports"; he chose the AI on demand only, and the thread's scope only).
+  - One question box: Ask (local: the scope's signed claims via ai-gate /api/known, plus the
+    Voice); Explain with AI and Report (through the gate, as assumptions; reports have cited
+    sections and a Download .md button).
+  - Faces and the claims table sit under "Browse all claims". Six views, keys 1-6.
+  - Checked live on spare ports against the real forge.db: scope James Gilbert gave 84 signed
+    claims, ranked, and the Voice answered, with no key and nothing sent.
 - Bad: no real Gemini answer has been seen yet. That needs James's key and model id.
 
 ### Frozen 2026-11-18 (James: "freeze")

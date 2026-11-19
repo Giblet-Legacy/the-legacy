@@ -1,9 +1,10 @@
 <!doctype html>
 <!--
   projection_v1_12.html — The Legacy 1.12.0 page (SPEC_V1_12.md §2): projection_v1_11.html arranged
-  into seven views behind a sidebar (Home, Ask, Create, Claims, Ledger, Field, System; a bottom bar
-  on a phone), Home led by "Needs you", only the open view refreshing, keys 1-7, and an
-  "Ask the AI" card. It asks through the Legacy's /api/ai/* relay to ai-gate, which is the only
+  into six views behind a sidebar (Home, Ask, Create, Ledger, Field, System; a bottom bar on a
+  phone), Home led by "Needs you", only the open view refreshing, keys 1-6. Ask is one place for
+  knowledge: the scope's signed claims and the Voice locally, and the AI (Explain, Report) only on
+  demand, through ai-gate. It asks through the Legacy's /api/ai/* relay to ai-gate, which is the only
   process that talks to the model. Every answer is shown as an ASSUMPTION with its status, conflicts,
   open questions and a 1-5 rating; approving it is a HAL seal in the terminal (seal_command). The
   Legacy never calls a model and never signs. Below, 1.11's description.
@@ -262,11 +263,10 @@
   <a href="#home" data-view="home"><span class="key">1</span>Home<span class="badge" id="badge-home"></span></a>
   <a href="#ask" data-view="ask"><span class="key">2</span>Ask<span class="badge" id="badge-ask"></span></a>
   <a href="#create" data-view="create"><span class="key">3</span>Create<span class="badge" id="badge-create"></span></a>
-  <a href="#claims" data-view="claims"><span class="key">4</span>Claims</a>
-  <a href="#ledger" data-view="ledger"><span class="key">5</span>Ledger</a>
-  <a href="#field" data-view="field"><span class="key">6</span>Field</a>
-  <a href="#system" data-view="system"><span class="key">7</span>System</a>
-  <div class="foot">keys 1-7 switch views<br>local-first · signed</div>
+  <a href="#ledger" data-view="ledger"><span class="key">4</span>Ledger</a>
+  <a href="#field" data-view="field"><span class="key">5</span>Field</a>
+  <a href="#system" data-view="system"><span class="key">6</span>System</a>
+  <div class="foot">keys 1-6 switch views<br>local-first · signed</div>
 </nav>
 
 <main>
@@ -286,9 +286,9 @@
   </section>
 </div>
 <div class="view" id="view-ask" data-view="ask">
-  <h1>Ask<span class="sub">the AI, through the gate</span></h1>
+  <h1>Ask<span class="sub">what you know, and the AI on demand</span></h1>
   <section class="card span-12" id="ai-card" aria-labelledby="ai-h">
-    <header><h2 id="ai-h">Ask the AI</h2><span class="meta" id="ai-meta">through ai-gate · every answer is an ASSUMPTION until you seal it</span></header>
+    <header><h2 id="ai-h">Ask the AI</h2><span class="meta" id="ai-meta">Ask is local · Explain and Report go through ai-gate as ASSUMPTIONS</span></header>
     <div class="body ai-layout">
       <div>
         <div class="meta" style="margin-bottom:6px">Threads</div>
@@ -297,18 +297,37 @@
       </div>
       <div>
         <form id="ai-form" class="grid" autocomplete="off">
-          <label>Thread<input name="topic" id="ai-topic" list="ai-topics" maxlength="60" required placeholder="noir" pattern="[a-z0-9][a-z0-9-]*"></label>
+          <label>Thread<input name="topic" id="ai-topic" list="ai-topics" maxlength="60" placeholder="noir" pattern="[a-z0-9][a-z0-9-]*"></label>
           <datalist id="ai-topics"></datalist>
           <label id="ai-about-l">Scope (for a new thread)<select id="ai-about" multiple size="3"></select></label>
-          <label class="full">Idea<textarea name="idea" id="ai-idea" maxlength="4000" required placeholder="What would he do at dawn?"></textarea></label>
-          <div class="full"><button type="submit" id="ai-ask">Ask</button> <span id="ai-status" class="muted"></span>
-            <span class="muted" style="float:right;font-size:12px">Ctrl+Enter asks</span></div>
+          <label class="full">Question<textarea name="idea" id="ai-idea" maxlength="4000" required placeholder="What has James built since August?"></textarea></label>
+          <div class="full">
+            <button type="submit" id="ai-local" title="the scope's signed claims and the Voice, on this machine">Ask</button>
+            <button type="button" class="sec" id="ai-ask" data-answer="assumption" title="sends this thread's claims to Gemini">Explain with AI</button>
+            <button type="button" class="sec" id="ai-report" data-answer="report" title="sends this thread's claims to Gemini">Report</button>
+            <span id="ai-status" class="muted"></span>
+            <span class="muted" style="float:right;font-size:12px">Ctrl+Enter asks · the AI only when you press it</span></div>
         </form>
+        <div id="ai-known"></div>
+        <div id="ai-voice"></div>
         <div id="ai-answer"></div>
         <div id="ai-history" style="margin-top:14px"></div>
       </div>
     </div>
   </section>
+  <details class="card span-12" id="browse" style="padding:0">
+    <summary style="padding:12px 16px;cursor:pointer;font-weight:600;font-size:13px">Browse all claims <span class="muted" style="font-weight:400">· faces and the full table</span></summary>
+    <div style="display:grid;gap:16px;padding:0 16px 16px">
+      <section class="card span-12" aria-labelledby="faces-h">
+    <header><h2 id="faces-h">Faces filled</h2><span class="meta" id="faces-meta"></span></header>
+    <div class="body"><div class="stack" id="stack"></div><div class="legend" id="legend"></div></div>
+  </section>
+      <section class="card span-12" aria-labelledby="claims-h">
+    <header><h2 id="claims-h">Claims</h2><span class="meta" id="claims-meta"></span></header>
+    <div class="tbl"><table><thead><tr><th>Subject</th><th>Face</th><th>Claim</th><th>ID</th></tr></thead><tbody id="claims"></tbody></table></div>
+  </section>
+    </div>
+  </details>
 </div>
 <div class="view" id="view-create" data-view="create">
   <h1>Create<span class="sub">drafts, signed in the terminal</span></h1>
@@ -338,28 +357,6 @@
   <section class="card span-5" aria-labelledby="echo-h">
     <header><h2 id="echo-h">Echo</h2><span class="meta">what committing it would do</span></header>
     <div class="body"><div id="preview" class="muted">Enter a subject and object to preview.</div><div id="inbox"></div></div>
-  </section>
-</div>
-<div class="view" id="view-claims" data-view="claims">
-  <h1>Claims<span class="sub">what you hold, by face</span></h1>
-  <section class="card span-12" aria-labelledby="query-h">
-    <header><h2 id="query-h">Query</h2><span class="meta">the Voice · answers only from FACT, COUNTER and CONTEXT claims</span></header>
-    <div class="body">
-      <form id="voice" class="console" autocomplete="off">
-        <label class="in" aria-label="Query"><span>&gt;</span><input name="q" maxlength="2000" required placeholder="is the sky blue?"></label>
-        <button type="submit">Run</button>
-      </form>
-      <div class="chips" id="suggest"></div>
-      <div class="log" id="voice-log"></div>
-    </div>
-  </section>
-  <section class="card span-12" aria-labelledby="faces-h">
-    <header><h2 id="faces-h">Faces filled</h2><span class="meta" id="faces-meta"></span></header>
-    <div class="body"><div class="stack" id="stack"></div><div class="legend" id="legend"></div></div>
-  </section>
-  <section class="card span-12" aria-labelledby="claims-h">
-    <header><h2 id="claims-h">Claims</h2><span class="meta" id="claims-meta"></span></header>
-    <div class="tbl"><table><thead><tr><th>Subject</th><th>Face</th><th>Claim</th><th>ID</th></tr></thead><tbody id="claims"></tbody></table></div>
   </section>
 </div>
 <div class="view" id="view-ledger" data-view="ledger">
@@ -399,11 +396,12 @@
 /* Views, the sidebar, "Needs you" and badges (SPEC_V1_12 §2.1). */
 (function () {
   "use strict";
-  var VIEWS = ["home", "ask", "create", "claims", "ledger", "field", "system"];
+  var VIEWS = ["home", "ask", "create", "ledger", "field", "system"];
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function show(v) {
+    if (v === "claims") { v = "ask"; }
     if (VIEWS.indexOf(v) < 0) { v = "home"; }
     window.__legacyView = v;
     Array.prototype.forEach.call(document.querySelectorAll(".view"), function (el) { el.classList.toggle("on", el.getAttribute("data-view") === v); });
@@ -490,7 +488,7 @@
   }
   // 1.12: which view each panel belongs to; unlisted panels (health, status, drafts) feed the
   // pills, metrics and "Needs you", so they always refresh. The others wait while hidden.
-  var POLL_VIEW = { claims: "claims", ledger: "ledger", network: "system", briefing: "home", lllm: "system" };
+  var POLL_VIEW = { claims: "ask", ledger: "ledger", network: "system", briefing: "home", lllm: "system" };
   function shown(name) { var v = POLL_VIEW[name]; return !v || window.__legacyView === v; }
   function poll(name, path, every, render, el) {
     var n = 0, timer = null;
@@ -571,8 +569,8 @@
       if (asks.length < 2 && !seen[c.subject]) { seen[c.subject] = true; asks.push("what is the " + c.subject + "?"); }
     });
     asks.push("how did you work that out?");
-    $("suggest").innerHTML = asks.map(function (a) { return '<button type="button" class="sec">' + escapeHtml(a) + "</button>"; }).join("");
-    Array.prototype.forEach.call($("suggest").querySelectorAll("button"), function (b) { b.addEventListener("click", function () { ask(b.textContent); }); });
+    if ($("suggest")) $("suggest").innerHTML = asks.map(function (a) { return '<button type="button" class="sec">' + escapeHtml(a) + "</button>"; }).join("");
+    if ($("suggest")) Array.prototype.forEach.call($("suggest").querySelectorAll("button"), function (b) { b.addEventListener("click", function () { ask(b.textContent); }); });
   }, function () { return $("claims"); });
 
   // ledger, filterable by kind (SPEC_V6 §2)
@@ -612,7 +610,7 @@
       log.innerHTML = html + "</div>" + log.innerHTML;
     }).catch(fail(log, "Query failed"));
   }
-  voiceForm.addEventListener("submit", function (ev) {
+  if (voiceForm) voiceForm.addEventListener("submit", function (ev) {
     ev.preventDefault();
     var q = new FormData(voiceForm).get("q").trim();
     if (q) { ask(q); voiceForm.reset(); }
@@ -761,24 +759,28 @@
 </script>
 
 <script>
-/* The AI card (SPEC_V1_12 §2.2). Reads /api/ai/* and /api/nouns; writes only /api/ai/ask and
-   /api/ai/rate, which the Legacy guards and relays to ai-gate. Never seals. */
+/* Ask (SPEC_V1_12 §2.2): one question. "Ask" is local: the scope's signed claims (ai-gate /api/known,
+   no model) and the Voice (/api/voice). "Explain with AI" and "Report" go through ai-gate only when
+   pressed, as ASSUMPTIONS. Writes only /api/ai/ask and /api/ai/rate (guarded by the Legacy). Never seals. */
 (function () {
   "use strict";
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-  function getJ(path) { return fetch(path, { headers: { Accept: "application/json" } }).then(function (r) { return r.json(); }); }
+  function getJ(path) { return fetch(path, { headers: { Accept: "application/json" } }).then(function (r) {
+    return r.json().then(function (d) { if (!r.ok && d && !d.error) { d.error = "status " + r.status; } return d; }); }); }
   function postJ(path, body) {
     return fetch(path, { method: "POST", headers: { "Content-Type": "application/json", "X-Forge-Legacy": "1" },
                          body: JSON.stringify(body) })
       .then(function (r) { return r.json().then(function (d) { return { status: r.status, data: d }; }); });
   }
-  function scoreText(s) {
-    if (!s || s.lambda == null) { return "AI λ unrated"; }
-    return "AI λ " + Number(s.lambda).toFixed(2) + " " + s.tier;
+  function scoreText(s) { return (!s || s.lambda == null) ? "AI λ unrated" : "AI λ " + Number(s.lambda).toFixed(2) + " " + s.tier; }
+  function box(title, inner, extra) {
+    return '<div style="margin-top:14px;padding:12px;border:1px solid var(--border2);border-radius:8px' + (extra || "") + '">' +
+      '<div class="meta" style="letter-spacing:.06em;margin-bottom:6px">' + title + "</div>" + inner + "</div>";
   }
-  var current = null, known = [];
+  var current = null, known = [], gateUp = false;
+
   function setThread(topic) {
     current = topic;
     $("ai-topic").value = topic || "";
@@ -786,14 +788,20 @@
     Array.prototype.forEach.call(document.querySelectorAll("#ai-threads a"), function (a) { a.classList.toggle("on", a.getAttribute("data-topic") === topic); });
     loadHistory();
   }
+  function scopeQuery() {
+    var t = $("ai-topic").value.trim();
+    if (t && known.indexOf(t) >= 0) { return "topic=" + encodeURIComponent(t); }
+    var about = Array.prototype.slice.call($("ai-about").selectedOptions).map(function (o) { return "about=" + encodeURIComponent(o.value); });
+    return about.length ? about.join("&") : null;
+  }
   function loadThreads() {
     getJ("/api/ai/threads").then(function (list) {
-      if (!Array.isArray(list)) {
-        $("ai-ask").disabled = true;
+      gateUp = Array.isArray(list);
+      $("ai-ask").disabled = $("ai-report").disabled = !gateUp;
+      if (!gateUp) {
         $("ai-threads").innerHTML = '<span class="error">' + esc((list && list.error) || "ai-gate did not answer") + "</span>";
         return;
       }
-      $("ai-ask").disabled = false;
       known = list.map(function (t) { return t.topic; });
       var pending = 0;
       list.forEach(function (t) { pending += (t.counts && t.counts.pending) || 0; });
@@ -814,63 +822,107 @@
       if (!Array.isArray(rows) || !rows.length) { $("ai-history").innerHTML = ""; return; }
       $("ai-history").innerHTML = '<div class="meta" style="margin-bottom:4px">Earlier in ' + esc(current) + "</div>" +
         rows.slice().reverse().map(function (a) {
-          return '<button type="button" class="sec ai-item" data-open="' + esc(a.id) + '">' + esc(a.status) + " · " +
-            (a.conflicts && a.conflicts.length ? "! " : "") + esc(a.idea.slice(0, 90)) + (a.rating ? " · rated " + a.rating : "") + "</button>";
+          return '<button type="button" class="sec ai-item" data-open="' + esc(a.id) + '">' + (a.answer === "report" ? "report · " : "") +
+            esc(a.status) + " · " + (a.conflicts && a.conflicts.length ? "! " : "") + esc((a.title || a.idea).slice(0, 90)) +
+            (a.rating ? " · rated " + a.rating : "") + "</button>";
         }).join("");
     });
   }
   function loadScope() {
     getJ("/api/nouns").then(function (d) {
       var opts = [];
-      (d.entities || []).concat(d.subjects || []).forEach(function (n) {
-        if (!n.draft) { opts.push('<option value="' + esc(n.name) + '">' + esc(n.name) + "</option>"); }
-      });
+      (d.entities || []).concat(d.subjects || []).forEach(function (n) { if (!n.draft) { opts.push('<option value="' + esc(n.name) + '">' + esc(n.name) + "</option>"); } });
       $("ai-about").innerHTML = opts.join("");
     }).catch(function () {});
   }
-  function render(a) {
-    var html = '<div style="margin-top:14px;padding:12px;border:1px solid var(--border2);border-radius:8px">' +
-      '<div class="meta" style="letter-spacing:.06em">ASSUMPTION · <b>' + esc(a.status) + "</b> · " + esc(a.topic) +
-      " · " + esc(a.model) + " · " + esc(a.id) + "</div>" +
-      '<div style="margin:8px 0 0;color:var(--muted)">' + esc(a.idea) + "</div>" +
-      '<p style="white-space:pre-wrap;margin:10px 0">' + esc(a.text) + "</p>";
-    if (a.builds_on && a.builds_on.length) { html += '<div class="muted">builds on ' + esc(a.builds_on.join(", ")) + "</div>"; }
-    (a.conflicts || []).forEach(function (c) { html += '<div style="color:var(--warn)">! conflicts with ' + esc(c.ref) + ": " + esc(c.why) + "</div>"; });
-    (a.open_questions || []).forEach(function (q) { html += "<div>? " + esc(q) + "</div>"; });
-    html += '<div style="margin-top:10px">Rate ' + [1, 2, 3, 4, 5].map(function (n) {
-      return '<button type="button" class="sec' + (a.rating === n ? " on" : "") + '" data-rate="' + n + '" data-id="' + esc(a.id) + '">' + n + "</button>";
-    }).join(" ") + ' <span id="ai-score" class="muted"></span></div>' +
-      '<div class="muted" style="margin-top:8px">Approve or refuse in the terminal (HAL seal): <code>' + esc(a.seal_command) + "</code></div></div>";
-    $("ai-answer").innerHTML = html;
+
+  // Ask: local only
+  function askLocal(q) {
+    var scope = scopeQuery();
+    if (!scope) {
+      $("ai-known").innerHTML = box("What the Legacy knows here", '<span class="muted">Pick a thread, or a scope for a new one, to see the signed claims it covers.</span>');
+    } else if (!gateUp) {
+      $("ai-known").innerHTML = box("What the Legacy knows here", '<span class="muted">Needs ai-gate running to scope the claims (Browse all claims below works without it).</span>');
+    } else {
+      getJ("/api/ai/known?" + scope + "&q=" + encodeURIComponent(q)).then(function (k) {
+        if (!k || !Array.isArray(k.claims)) { $("ai-known").innerHTML = box("What the Legacy knows here", '<span class="error">' + esc((k && k.error) || "not available") + "</span>"); return; }
+        var hits = k.claims.filter(function (c) { return c.score > 0; }), show = (hits.length ? hits : k.claims).slice(0, 8);
+        var rows = show.map(function (c) {
+          return '<div class="kv" style="align-items:flex-start"><span class="k" style="min-width:3em">' + esc(c.ref) + '</span><span style="flex:1">' +
+            '<span class="mono" style="font-size:11px;color:var(--' + esc(c.face) + ')">' + esc(c.face) + "</span> " + esc(c.subject) + " / " +
+            esc(c.predicate || "is") + " / " + esc(c.object) + '<br><span class="muted">' + esc(c.text) + '</span></span><span class="v">' + esc(String(c.claim_id).slice(0, 12)) + "</span></div>";
+        }).join("");
+        var note = hits.length ? hits.length + " of " + k.claims.length + " claims in scope match" : "no claim in scope matches the words; showing the first " + show.length + " of " + k.claims.length;
+        $("ai-known").innerHTML = box("What the Legacy knows here · signed claims · scope " + esc(k.about.join(", ")), rows + '<div class="muted" style="margin-top:6px;font-size:12px">' + esc(note) + "</div>");
+      });
+    }
+    getJ("/api/voice?" + new URLSearchParams({ q: q }).toString()).then(function (d) {
+      var inner = d.available ? '<div style="white-space:pre-wrap">' + esc(d.reply) + "</div>" : '<span class="muted">' + esc(d.error || "the Voice is not available") + "</span>";
+      $("ai-voice").innerHTML = box("The Voice · local, from FACT, COUNTER and CONTEXT claims", inner);
+    }).catch(function () { $("ai-voice").innerHTML = ""; });
   }
+
+  // Explain / Report: through the gate, only when pressed
+  function render(a) {
+    var body = "";
+    if (a.answer === "report" && a.sections) {
+      body += '<h3 style="margin:6px 0 8px;font-size:16px">' + esc(a.title) + "</h3>";
+      a.sections.forEach(function (s) {
+        body += '<div style="margin-bottom:10px"><b>' + esc(s.heading) + '</b><div style="white-space:pre-wrap">' + esc(s.text) + "</div>" +
+          (s.cites && s.cites.length ? '<div class="muted" style="font-size:12px">cites ' + esc(s.cites.join(", ")) + "</div>" : "") + "</div>";
+      });
+    } else {
+      body += '<div style="color:var(--muted)">' + esc(a.idea) + '</div><p style="white-space:pre-wrap;margin:10px 0">' + esc(a.text) + "</p>";
+      if (a.builds_on && a.builds_on.length) { body += '<div class="muted">builds on ' + esc(a.builds_on.join(", ")) + "</div>"; }
+    }
+    (a.conflicts || []).forEach(function (c) { body += '<div style="color:var(--warn)">! conflicts with ' + esc(c.ref) + ": " + esc(c.why) + "</div>"; });
+    (a.open_questions || []).forEach(function (q) { body += "<div>? " + esc(q) + "</div>"; });
+    body += '<div style="margin-top:10px">Rate ' + [1, 2, 3, 4, 5].map(function (n) {
+      return '<button type="button" class="sec' + (a.rating === n ? " on" : "") + '" data-rate="' + n + '" data-id="' + esc(a.id) + '">' + n + "</button>";
+    }).join(" ") + ' <span id="ai-score" class="muted"></span>' +
+      (a.answer === "report" ? ' <button type="button" class="sec" id="ai-md">Download .md</button>' : "") + "</div>" +
+      '<div class="muted" style="margin-top:8px">Approve or refuse in the terminal (HAL seal): <code>' + esc(a.seal_command) + "</code></div>";
+    $("ai-answer").innerHTML = box((a.answer === "report" ? "REPORT · " : "") + "ASSUMPTION · <b>" + esc(a.status) + "</b> · " + esc(a.topic) + " · " + esc(a.model) + " · " + esc(a.id), body, ";border-color:var(--accent)");
+    if (a.answer === "report" && $("ai-md")) {
+      $("ai-md").addEventListener("click", function () {
+        var md = "<!-- ASSUMPTION " + a.id + " (" + a.status + "), not a fact -->\n" + a.text + "\n";
+        var url = URL.createObjectURL(new Blob([md], { type: "text/markdown" })), link = document.createElement("a");
+        link.href = url; link.download = (a.title || "report").replace(/[^a-z0-9]+/gi, "-").toLowerCase() + ".md";
+        document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+      });
+    }
+  }
+  function askGate(kind) {
+    var topic = $("ai-topic").value.trim(), q = $("ai-idea").value;
+    if (!topic || !q.trim()) { $("ai-status").textContent = "a thread and a question first"; return; }
+    var about = Array.prototype.slice.call($("ai-about").selectedOptions).map(function (o) { return o.value; });
+    var body = { idea: q, topic: topic, lllm: true, answer: kind };
+    if (about.length && known.indexOf(topic) < 0) { body.about = about; }
+    $("ai-ask").disabled = $("ai-report").disabled = true;
+    $("ai-status").textContent = (kind === "report" ? "writing a report" : "asking") + " through the gate…";
+    postJ("/api/ai/ask", body).then(function (r) {
+      $("ai-ask").disabled = $("ai-report").disabled = !gateUp;
+      if (r.status === 201) { $("ai-status").textContent = ""; render(r.data); current = topic; loadThreads(); loadHistory(); }
+      else { $("ai-status").textContent = (r.data && r.data.error) || ("refused (" + r.status + ")"); }
+    }).catch(function () { $("ai-ask").disabled = $("ai-report").disabled = !gateUp; $("ai-status").textContent = "the Legacy did not answer"; });
+  }
+
   $("ai-threads").addEventListener("click", function (e) {
     var a = e.target.closest ? e.target.closest("a[data-topic]") : null;
     if (a) { e.preventDefault(); setThread(a.getAttribute("data-topic")); $("ai-answer").innerHTML = ""; $("ai-idea").focus(); }
   });
   $("ai-new").addEventListener("click", function () { setThread(null); $("ai-answer").innerHTML = ""; $("ai-topic").focus(); });
-  $("ai-topic").addEventListener("input", function () {
-    var t = $("ai-topic").value.trim();
-    $("ai-about-l").style.display = known.indexOf(t) >= 0 ? "none" : "";
-  });
+  $("ai-topic").addEventListener("input", function () { $("ai-about-l").style.display = known.indexOf($("ai-topic").value.trim()) >= 0 ? "none" : ""; });
   $("ai-idea").addEventListener("keydown", function (e) {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); $("ai-form").requestSubmit(); }
   });
   $("ai-form").addEventListener("submit", function (e) {
     e.preventDefault();
-    var topic = $("ai-topic").value.trim();
-    var about = Array.prototype.slice.call($("ai-about").selectedOptions).map(function (o) { return o.value; });
-    var body = { idea: $("ai-idea").value, topic: topic, lllm: true };
-    if (about.length && known.indexOf(topic) < 0) { body.about = about; }
-    $("ai-ask").disabled = true;
-    $("ai-status").textContent = "asking through the gate…";
-    postJ("/api/ai/ask", body).then(function (r) {
-      $("ai-ask").disabled = false;
-      if (r.status === 201) {
-        $("ai-status").textContent = ""; $("ai-idea").value = "";
-        render(r.data); current = topic; loadThreads(); loadHistory();
-      } else { $("ai-status").textContent = (r.data && r.data.error) || ("refused (" + r.status + ")"); }
-    }).catch(function () { $("ai-ask").disabled = false; $("ai-status").textContent = "the Legacy did not answer"; });
+    var q = $("ai-idea").value.trim();
+    if (q) { $("ai-answer").innerHTML = ""; askLocal(q); }
   });
+  $("ai-ask").addEventListener("click", function () { askGate("assumption"); });
+  $("ai-report").addEventListener("click", function () { askGate("report"); });
   $("ai-history").addEventListener("click", function (e) {
     var b = e.target.closest ? e.target.closest("button[data-open]") : null;
     if (b) { getJ("/api/ai/assumption?id=" + encodeURIComponent(b.getAttribute("data-open"))).then(render); }

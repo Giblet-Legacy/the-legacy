@@ -47,12 +47,15 @@ on a phone). Every 1.11 card is kept, and only the arrangement changes:
 | View | Cards |
 |---|---|
 | 1 Home | **Needs you** (new), Metrics, Briefing |
-| 2 Ask | Ask the AI |
+| 2 Ask | one question box (the Query card folded in), with Faces and Claims under "Browse all claims" |
 | 3 Create | New, Echo |
-| 4 Claims | Query, Faces, Claims |
-| 5 Ledger | Ledger |
-| 6 Field | the Field, full height |
-| 7 System | Layers, Network, LLLM |
+| 4 Ledger | Ledger |
+| 5 Field | the Field, full height |
+| 6 System | Layers, Network, LLLM |
+
+(Claims was its own view at first. James then asked "should ask and claim be the same thing, giving the llm
+access to the knowledge, and be able to pull claims and generate reports". It was merged into Ask, see §2.2.
+An old `#claims` address opens Ask.)
 
 - **Needs you** lists drafts waiting to be committed and assumptions
   waiting for a HAL seal, each with its terminal command. "Nothing needs
@@ -63,13 +66,33 @@ on a phone). Every 1.11 card is kept, and only the arrangement changes:
   wait while hidden. The Field's iframe loads only when the Field view
   is first opened.
 - Each view has an address (`#home` … `#system`), so the back button and
-  bookmarks work. Keys 1-7 switch views (not while typing). The last
+  bookmarks work. Keys 1-6 switch views (not while typing). The last
   view is remembered in this browser.
 - **Ask:** threads down the left (each with counts and the AI's λ).
   Clicking a thread shows its earlier answers, and clicking one opens
   it. The scope picker shows only for a new thread. Ctrl+Enter asks.
 
-### 2.2 The AI card
+### 2.2 Ask: one place for knowledge
+
+James chose: the AI **only on demand**, and the AI sees **only the thread's
+scope**. The Legacy pulls the claims; the AI never queries the database.
+
+- **Ask** (the default, and Ctrl+Enter) is local and instant:
+  - **What the Legacy knows here:** the thread's (or the chosen
+    scope's) signed claims, ranked against the question by ai-gate's
+    `/api/known`. It uses no model. Each claim shows its ref, face,
+    subject / predicate / object, text and id;
+  - **the Voice** (`/api/voice`), as the Query card did.
+- **Explain with AI** and **Report** go through ai-gate only when
+  pressed (`/api/ai/ask` with `answer` `assumption` or `report`). Each
+  comes back as an **ASSUMPTION**: rated, sealed in the terminal, never
+  canon. A report shows its title, its sections with their cites, and a
+  **Download .md** button.
+- **Browse all claims** (folded): the Faces card and the full claims
+  table, which refresh only while Ask is open.
+- The relay also allows `GET /api/ai/known`.
+
+### 2.3 The AI card (first version)
 
 The 1.11 page with one card, **Ask the AI** (`id="ai-card"`):
 

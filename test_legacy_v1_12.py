@@ -124,7 +124,7 @@ def test_get_relayed_from_the_allowlist_only(server, gate):
     assert s == 200 and json.loads(body) == {"stub": True, "path": "/api/threads"}
     s, body = _get(server, "/api/ai/thread?topic=noir")
     assert json.loads(body)["path"] == "/api/thread?topic=noir"
-    for p in ("status", "assumptions", "assumption", "score", "health"):
+    for p in ("status", "assumptions", "assumption", "known", "score", "health"):
         assert json.loads(_get(server, f"/api/ai/{p}")[1])["path"] == f"/api/{p}"
     n = len(gate)
     assert _get(server, "/api/ai/../../etc")[0] == 404 and _get(server, "/api/ai/secrets")[0] == 404
@@ -170,8 +170,13 @@ def test_inbox_still_works(server, gate):
 def test_page_has_the_ai_card(server):
     page = _get(server, "/")[1]
     for needle in ('id="ai-card"', "Ask the AI", "/api/ai/ask", "/api/ai/rate", "/api/ai/threads",
-                   "seal_command", "ASSUMPTION", 'id="ai-about"', "Commit: <code>python forge_cli_v1_8.py inbox commit"):
+                   "seal_command", "ASSUMPTION", 'id="ai-about"', "Commit: <code>python forge_cli_v1_8.py inbox commit",
+                   # one place for knowledge: local Ask, the AI only on demand (SPEC_V1_12 §2.2)
+                   'id="ai-local"', 'data-answer="assumption"', 'data-answer="report"', "/api/ai/known", "/api/voice",
+                   'id="browse"', 'aria-labelledby="claims-h"', "Download .md"):
         assert needle in page, needle
+    ask = page[page.index('id="view-ask"'):page.index('id="view-create"')]
+    assert 'aria-labelledby="claims-h"' in ask and 'aria-labelledby="faces-h"' in ask
 
 
 # 6b
@@ -180,14 +185,14 @@ def test_page_is_seven_views_behind_a_sidebar(server):
     import re
     page = _get(server, "/")[1]
     views = re.findall(r'class="view" id="view-([a-z]+)" data-view="\1"', page)
-    assert views == ["home", "ask", "create", "claims", "ledger", "field", "system"]
+    assert views == ["home", "ask", "create", "ledger", "field", "system"]  # Claims merged into Ask
     for v in views:
         assert f'href="#{v}" data-view="{v}"' in page, v
     assert 'id="needs"' in page and page.index('id="needs"') < page.index('id="metrics"')  # Home leads with it
     for b in ("badge-home", "badge-ask", "badge-create"):
         assert f'id="{b}"' in page
-    assert page.count('<section class="card') == 14  # every 1.11 card kept, plus Needs you
-    for card in ("metrics-h", "layers-h", "faces-h", "query-h", "claims-h", "ledger-h", "field-h", "new-h",
+    assert page.count('<section class="card') == 13  # the 1.11 cards, Query folded into Ask, plus Needs you
+    for card in ("metrics-h", "layers-h", "faces-h", "claims-h", "ledger-h", "field-h", "new-h",
                  "echo-h", "ai-h", "net-h", "brief-h", "lllm-h", "needs-h"):
         assert f'aria-labelledby="{card}"' in page, card
     assert "if (!shown(name))" in page and 'window.__legacyView !== "field"' in page  # hidden views wait

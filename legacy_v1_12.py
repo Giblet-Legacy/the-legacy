@@ -47,7 +47,7 @@ if _HERE not in sys.path:
 import legacy_v10 as _v10  # noqa: E402
 import legacy_v1_11 as _v1_11  # noqa: E402
 
-GET_ALLOWED = ("health", "status", "threads", "thread", "assumptions", "assumption", "score")
+GET_ALLOWED = ("health", "status", "threads", "thread", "assumptions", "assumption", "known", "score")
 POST_ALLOWED = ("ask", "rate")
 OFFLINE = "ai-gate is not running (start it with boot_v1_12.py, or python ../ai-gate/ai_gate_serve.py)"
 
