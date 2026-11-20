@@ -7,10 +7,11 @@ Function:
     frozen. This is the plan for 2.0.0 under his consolidation rule
     (2026-11-16: "consolidate what is if adding more its a new v"): one
     clean major version, identical behaviour, old layers archived
-    byte-identical, nothing added and nothing fixed. Planned, not
-    started; waiting for James's sign-off on §6.
+    byte-identical, nothing added and nothing fixed. Built on branch
+    consolidate-2.0.0, through its gate (§9), and frozen on James's
+    "freeze" (2026-11-20): merged into main in one commit, tagged v2.0.0.
 
-Version:  plan, draft 1 (2026-11-20)
+Version:  plan, done (2026-11-20: frozen 2.0.0, tag v2.0.0)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
 
@@ -48,7 +49,8 @@ today.** That means:
 
 What 2.0.0 does **not** keep is behaviour that only an older entry point
 had and 1.12.0 has replaced, such as legacy.py's v1 page at `/`. Those
-stay runnable from `archive/1.12.0/`.
+stay runnable from a worktree of the tag `v1.12.0` (§9: not from the
+archive folder itself).
 
 | 2.0.0 file | Made from |
 |---|---|
@@ -90,7 +92,7 @@ running them, not by guessing:
    - Nothing is added; a known flake (Q18's race) stays a known flake.
 3. **The 2.0.0 gate:**
    - every carried test passes against v2;
-   - the same tests pass against 1.12.0 in the archive;
+   - the same tests pass against 1.12.0 (Step 0 showed this);
    - a side-by-side run (1.12.0 and 2.0.0 on spare ports, against a copy of
      the real forge.db) gives identical JSON from every GET endpoint, and
      an identical page apart from its header comment.
@@ -105,8 +107,8 @@ running them, not by guessing:
 4. **Move the old files into `archive/1.12.0/` with `git mv`.** They stay
    byte-identical. That covers every legacy*.py, boot*.py, SPEC*.md,
    test_*.py and static/*.html, and `pytest.ini` keeps archive/ out of
-   collection (as the Cockpit's does). The archive runs on its own, since
-   its files import their siblings.
+   collection (as the Cockpit's does). (Draft 1 said the archive runs on
+   its own. It does not: §9.)
 5. **Write the contract tests (§3.2) first and run them red.** Then
    write legacy_v2, boot_v2, projection_v2 and SPEC_V2 until they're
    green.
@@ -141,18 +143,80 @@ running them, not by guessing:
   `/srv/legacy/src/ai-gate` exists. Either way, asks are refused there
   (no key, view-only guard).
 
-## 6. Decisions for James
+## 6. Decisions (James, 2026-11-20: "yes to all 4 1 archive folder and no to s24")
 
-1. **Is "behaviour = what boot_v1_12 does" right?** The alternative,
-   keeping every old entry point's behaviour in v2, would rebuild the
-   pile.
-2. **Is the branch, merged at freeze, OK?** It's the only way to keep
-   the VPS running throughout.
-3. **Archive layout:** one `archive/1.12.0/` holding everything (simple,
-   and runnable as-is), or one folder per old version (closer to the
-   history, but it won't run as-is). The recommendation is the first.
-4. **The S24:** should 2.0.0 also be confirmed on the S24 before the
-   freeze?
+1. Behaviour is what boot_v1_12 does.
+2. The work is on branch `consolidate-2.0.0`, merged once at the freeze.
+3. One archive folder: `archive/1.12.0/`.
+4. No S24 run; the laptop is enough.
+
+## 8. Step 0 result (2026-11-20)
+
+**How it was run:**
+- The tag `v1.12.0` was made, and the work is on branch
+  `consolidate-2.0.0`.
+- A scratchpad pytest plugin swapped every old `make_server` for 1.12.0's,
+  every old `boot_vN.main` for `boot_v1_12.main`, and every old legacy
+  `main` for 1.12.0's. legacy_v10's `main` was left alone, because 1.12.0
+  runs through it.
+- No file in the repository changed.
+
+**What a pass or a fail meant:**
+- A passing test counts as live only if it actually goes through 1.12.0's
+  server or boot.
+- A test that only calls an old helper 1.12.0 no longer reaches, or starts
+  an old file in a subprocess, passes trivially. It was counted as
+  replaced.
+- Five failing tests mixed live and replaced checks. Their live checks
+  were split out and run alone against 1.12.0, and they pass.
+
+**The totals:** 75 old tests. **40 are live** and carried as they are, **6
+are mixed** (only the live checks are carried), and **29 are replaced**.
+(Draft 2 said 41 and 5; §9 says which test moved.)
+test_legacy_v1_12's 9 tests become test_legacy_v2.py.
+
+### Live, carried as `<suite>_at_v2.py` (40)
+
+| Old suite | Tests |
+|---|---|
+| test_legacy | health_endpoint_returns_json, index_returns_html, post_returns_405, path_traversal_blocked, unknown_route_returns_404, weaver_endpoint_returns_json |
+| test_legacy_v2 | v2_head_health, v2_health_survives_missing_cryptography, v2_index_and_weaver_inherited, v2_post_returns_405, v2_main_rejects_bad_args |
+| test_legacy_v3 | health_runs_current_layers (v3.probe_layers is what /api/health calls), nerves_states (v3.get_nerves is what /api/nerves calls) |
+| test_legacy_v4 | read_routes, echo_route, inbox_write_and_commit, inbox_guards, voice |
+| test_legacy_v5 | claims_route, chain_route, v4_routes_inherited |
+| test_legacy_v6 | claims_have_every_face, chain_kind_filter |
+| test_legacy_v7 | voice_speaks_text_and_aspects |
+| test_legacy_v8 | backoff, supervisor_order_and_restarts (boot.py's, used by boot_v1_12), server_buffer (v8.buffered is in 1.12.0's chain) |
+| test_legacy_v11 | field_url_unchanged_without_the_variable, field_url_public_path, field_url_bad_values_ignored (5 cases) |
+| test_legacy_v12 | inbox_lists_each_kind, nouns_empty_without_a_database, nouns_registered_and_drafted, page, post_drafts_of_each_kind, post_refusals |
+| test_legacy_v1_11 | inbox_in_the_order_posted, nouns_drafts_in_the_order_written, page, posts_and_refusals_as_v12 |
+
+### Mixed: only the live checks are carried (6)
+
+| Test | Carried | Replaced, and by what |
+|---|---|---|
+| v3 test_http | health has 15 layers; nerves unavailable; POST /api/health is 405 | the briefing via `legacy_v3._weaver` (v10's Weaver v1.4) |
+| v4 test_lllm_and_field_states | /api/field unreachable, then reachable | "LLLM unavailable" with no LLLM_HOME (v7's /api/lllm) |
+| v6 test_older_routes_inherited | health has 15 layers; cockpit total | the Voice reply's wording (v7's Voice) |
+| v7 test_briefing_and_lllm_with_engine | /api/lllm build; /api/cockpit total | the briefing's LLLM line (v10) |
+| v7 test_page_and_inherited_routes | /api/claims; /api/chain?kind=claim | projection_v7.html (the 1.12 page) |
+| v10 test_briefing_through_weaver_v1_4 | the briefing through Weaver v1.4 | that the frozen legacy_v7 still used weaver_v1_3: a check on the old layer, found when carrying (§9) |
+
+### Replaced, left in the archive (29)
+
+| Why | Tests |
+|---|---|
+| Old helpers that 1.12.0 no longer reaches | legacy: probe_layers ×4, get_briefing ×3; v2: v1_raises_without_cryptography, v2_captures_missing_cryptography, v2_probe_layers_matches_v1, get_briefing_is_v1; v3: weaver_finds_real_claims; v4: briefing_from_any_directory (v4._weaver, in a subprocess) |
+| Old pages | v4, v5, v6, v9 page tests, v10 test_page, v8 test_page (reads projection_v8.html), v9 phone_tables (projection_v9 in a browser) |
+| Old briefing format | v7 briefing_without_engine (v10 replaced it) |
+| Old boots (two services; 1.12.0 starts three) | boot_v2, boot_v5, v9 boot_v3_order, v10 boot_v4_order, v11 boot_v6_order_and_env, v12 boot_v7_order, v1_11 boot_v1_11_order. test_legacy_v1_12's boot test covers boot_v1_12. |
+| Old boot.py started in a subprocess | v8 boot_end_to_end |
+
+**One gap to note:** v8's boot_end_to_end is the only test that boots
+the real processes, and it boots 1.4.0's `boot.py`. 1.12.0 has no
+end-to-end test. Nothing is added in a consolidation, so the §3.3
+side-by-side run stands in for it. A boot_v2 end-to-end test can come
+afterwards, as 2.1.0.
 
 ## 7. Left out on purpose
 
@@ -167,3 +231,55 @@ running them, not by guessing:
   true of the archive.
 - **ai-gate stays 0.1.0-dev.** The Legacy relays only to its HTTP
   paths, so 2.0.0 doesn't need it frozen.
+
+## 9. Built (2026-11-20, James: "go ahead")
+
+All of this is on branch `consolidate-2.0.0`. main, and so the VPS, is
+still 1.12.0.
+
+- **The tag and the archive:** `v1.12.0` is tagged and pushed. The 56
+  versioned files and 10 pages moved with `git mv` into
+  `archive/1.12.0/`, byte-identical. `pytest.ini` never collects archive/.
+- **The archive does not run where it sits.** Every old layer finds its
+  sibling repos through `../`, and from `archive/1.12.0/` that is
+  `archive/`. To run 1.12.0, use a worktree of the tag beside the other
+  repos (`git worktree add ../the-legacy-1.12.0 v1.12.0`). The side-by-side
+  run did exactly that.
+- **The tests, written first and run red (13 collection errors):**
+  - `test_legacy_v2.py` is 1.12.0's 9 tests, renamed.
+  - Twelve `test_*_at_v2.py` suites hold 46 tests: 40 live and 6 mixed.
+    They were made by a script that keeps the live tests, cuts the replaced
+    checks (each cut is marked) and imports the old names as aliases of
+    legacy_v2 and boot_v2.
+  - One more mixed test was found while carrying: v10's briefing test also
+    asserted that the frozen legacy_v7 used weaver_v1_3.
+- **What was built:**
+  - `legacy_v2.py`: one module and one handler; each route is the code of
+    the layer that answered it in 1.12.0 (SPEC_V2 §1).
+  - `boot_v2.py`: boot.py plus boot_v1_12's main.
+  - `static/projection_v2.html`: projection_v1_12.html with two header
+    lines added.
+  - `SPEC_V2.md`.
+- **One simplification, shown to be equivalent:** 1.12.0's /api/nouns
+  listed drafts through Cockpit v1.7, then sorted them into v1.8's order.
+  v1.8 re-exports v1.7's validate_any and describe and reads the same
+  inbox files, so v2 lists them through v1.8 directly. The side-by-side
+  run agrees.
+- **Two deliberate text changes** (SPEC_V2 §4): the startup banner, and
+  the "ai-gate is not running" message. Both named files that 2.0.0
+  renames.
+- **The gate:**
+  - **Tests:** 59 of 59 pass.
+  - **Side by side:** 51 checks, 0 differences. That covers every GET
+    route and its error cases, HEAD, the other methods, the write guard's
+    refusals, the ai relay with the gate down, and the page below its
+    header. The only things set aside were the buffer's `fetched_at`, λ
+    and claim ages (they move with the moment of the request; the briefing
+    text is identical), and the §4 message.
+  - **Boot:** boot_v2 on spare ports started the Field, ai-gate and the
+    Legacy. Through the Legacy, /api/field said the Field was reachable,
+    /api/ai/health said `{"ok": true}`, and / served projection_v2.html.
+- **Left for James:**
+  - **Q19:** the page's stale Field hint (`boot_v3.py`, `serve_v7.py`) is
+    kept, since a consolidation fixes nothing.
+  - **Q20:** an end-to-end boot test for boot_v2, in 2.1.0.

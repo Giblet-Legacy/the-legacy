@@ -30,4 +30,6 @@
 # 1.11.0 — legacy_v1_11.py + boot_v1_11.py frozen 2026-11-18 (James: "freeze") (SPEC_V1_11.md: drafts through Cockpit 1.8.0, in the order written). 78/79; the one failure is Q18's race, which passes alone.
 # 1.12.0 — legacy_v1_12.py + boot_v1_12.py frozen 2026-11-20 (James: "freeze then plan 2.0.0 consolidation") (SPEC_V1_12.md: the AI on the page through ai-gate; Claims merged into Ask; six views).
 
-1.12.0
+# 2.0.0 — legacy_v2.py + boot_v2.py frozen 2026-11-20 (James: "freeze") (SPEC_V2.md: the consolidation of 1.12.0, CONSOLIDATION_V2.md; 1.12.0 byte-identical in archive/1.12.0/ and at tag v1.12.0). 59/59; side by side 51/51.
+
+2.0.0

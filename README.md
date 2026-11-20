@@ -13,23 +13,21 @@ Tier:     Tier 1 — Consumer (The Connector)
 Depends:  All consumers (Cockpit, Substrate, Weaver, SC-OS, Echo)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
-Status:   1.7.0 — v1.0.0 The Projection (legacy_v4), v1.1.0 its redesign
-          (legacy_v5), v1.2.0 multi-face claims (legacy_v6), v1.3.0 the
-          LLLM wired through (legacy_v7), v1.4.0 boot together (legacy_v8
-          + boot.py), v1.5.0 boot_v2, v1.6.0 the page on a phone (legacy_v9
-          + boot_v3), v1.7.0 the Briefing through Weaver v1.4 (legacy_v10
-          + boot_v4); all frozen.
+Status:   2.0.0 (frozen 2026-11-20) — the consolidation of 1.12.0 (CONSOLIDATION_V2.md,
+          SPEC_V2.md): legacy_v2.py, boot_v2.py, static/projection_v2.html.
+          1.12.0 and everything before it is byte-identical in
+          archive/1.12.0/ and at the tag v1.12.0.
 
 ## Running
 
-    python boot_v5.py                        # the Field (v8, you at the centre), then The Legacy (v10)
-    python boot_v4.py                        # the Field (v7), then The Legacy (v10), kept running
-    python legacy_v10.py [--host 127.0.0.1] [--port 8080]
-    python ../scp-substrate/serve_v7.py      # the 3D Field alone, embedded on the page
+    python boot_v2.py                        # the Field, ai-gate, then The Legacy 2.0.0, kept running
+    python legacy_v2.py [--host 127.0.0.1] [--port 8080]
+    python ../scp-substrate/serve_v8.py      # the 3D Field alone, embedded on the page
+    # the AI (optional, the gate only): GEMINI_API_KEY and FORGE_GEMINI_MODEL
     # LLLM engine (optional): LLLM_HOME=<engine var dir>, LLLM_CLI=<engine>/lllm/cli.py
     python -m pytest -q
 
-Open <http://127.0.0.1:8080/>. Ctrl-C stops both.
+Open <http://127.0.0.1:8080/>. Ctrl-C stops all three.
 
 ## On the phone (Termux)
 
@@ -44,19 +42,21 @@ for r in scp-substrate the-legacy the-weaver; do (cd "$r" && git pull --ff-only 
 (cd the-weaver && python -m pytest -q)
 echo "LLLM_HOME=$LLLM_HOME LLLM_CLI=$LLLM_CLI"
 ls "${LLLM_HOME:-$HOME/lllm/var}/models" 2>&1   # is there an LLLM engine build on this phone?
-cd the-legacy && python boot_v5.py
+cd the-legacy && python boot_v2.py
 ```
 
 Then open <http://127.0.0.1:8080/> in the phone's browser. The Claims
 and Ledger tables should read as full sentences (no hash columns), and
 the Field's orb names should not sit on top of each other.
-`termux-wake-lock` keeps it running with the screen off; Ctrl-C stops both.
+`termux-wake-lock` keeps it running with the screen off; Ctrl-C stops them all.
 
-`legacy.py` is the frozen v1 shell, `legacy_v2.py` the layer over it
-(SPEC_V2.md), and `legacy_v3.py` the layer over that (SPEC_V3.md:
-current-layer health, Weaver v1.1, /api/nerves), and so on up to
-`legacy_v10.py` (SPEC_V11.md; every layer is listed in CLAUDE.md). Run
-`boot_v4.py`.
+From 2.0.0 The Legacy is one module (`legacy_v2.py`), one boot
+(`boot_v2.py`) and one page (`static/projection_v2.html`), described by
+`SPEC_V2.md`. The fourteen layers it replaced (legacy.py to
+legacy_v1_12.py, boot.py to boot_v1_12.py, SPEC.md to SPEC_V1_12.md) are
+in `archive/1.12.0/`. They import their siblings through `../`, so to run
+1.12.0 itself, check out the tag: `git worktree add ../the-legacy-1.12.0
+v1.12.0`.
 
 ## What The Legacy shows
 
