@@ -105,3 +105,14 @@ NOTES.md — open questions and decisions for The Legacy.
   3 of 5 runs alone (boot.py and legacy_v8 unchanged). Fix as a new test
   layer that waits for both log lines before stopping boot. Raised
   2026-11-16. Owner: James.
+  **2026-11-20:** test_boot_end_to_end stays in archive/1.12.0/ with the
+  1.4.0 boot it tests (CONSOLIDATION_V2 §8), so the race no longer runs.
+  An end-to-end test for boot_v2 is Q20.
+- **Q19.** The page's Field hint (projection_v1_12.html, carried byte for
+  byte into projection_v2.html) still says `python boot_v3.py` and
+  `serve_v7.py`, both wrong since 1.7.0. A consolidation fixes nothing, so
+  2.0.0 keeps it. Fix in 2.1.0? Raised 2026-11-20. Owner: James.
+- **Q20.** 1.12.0 had no end-to-end boot test: the only one booted the
+  1.4.0 boot.py. 2.0.0 was booted end to end by hand (CONSOLIDATION_V2 §9).
+  Add a boot_v2 end-to-end test (waiting for every "up" line, Q18) in 2.1.0?
+  Raised 2026-11-20. Owner: James.

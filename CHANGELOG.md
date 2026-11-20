@@ -4,6 +4,41 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ## [Unreleased]
 
+### Built 2026-11-20, not frozen: 2.0.0, the consolidation of 1.12.0 (James: "go ahead")
+
+On branch `consolidate-2.0.0`; main and the VPS stay on 1.12.0 until the freeze.
+
+#### Good
+
+- One module, one handler and one boot replace a fourteen-layer chain (CONSOLIDATION_V2.md, SPEC_V2.md):
+  - `legacy_v2.py`: each route is the code of the 1.12.0 layer that answered it;
+  - `boot_v2.py`: boot.py plus boot_v1_12;
+  - `static/projection_v2.html`: projection_v1_12.html plus two header lines;
+  - `SPEC_V2.md`.
+  - No monkeypatching of legacy_v10's main any more.
+- The 1.12.0 files are tagged `v1.12.0` and moved byte-identical into `archive/1.12.0/`, which `pytest.ini`
+  never collects.
+- The contract was found by running every old suite against 1.12.0 (Step 0), not by guessing:
+  - 40 live tests and 6 mixed ones are carried as twelve `test_*_at_v2.py` suites, plus 1.12.0's own 9 as
+    `test_legacy_v2.py`;
+  - written first and run red; now 59/59.
+- 1.12.0 and 2.0.0, side by side on a copy of the real ~/.forge: 51 checks, 0 differences. boot_v2 booted
+  the Field, ai-gate and the Legacy, and each answered.
+
+#### Bad
+
+- The archive does not run where it sits: every old layer reaches its siblings through `../`. Run 1.12.0
+  from a worktree of the tag. Draft 1 of the plan said otherwise; draft 3 corrects it.
+- Two texts change because they name renamed files (SPEC_V2 §4): the startup banner, and the "ai-gate is
+  not running" message.
+- 29 old tests are left in the archive because 1.12.0 had replaced what they test. One of them was the only
+  end-to-end boot test, and it booted 1.4.0. 2.0.0 was booted end to end by hand (NOTES Q20).
+
+#### Ugly
+
+- The page's Field hint still names `boot_v3.py` and `serve_v7.py`, both wrong since 1.7.0. A
+  consolidation fixes nothing, so it is kept (NOTES Q19).
+
 ### Frozen 2026-11-20 (James: "freeze then plan 2.0.0 consolidation")
 
 - legacy_v1_12.py + boot_v1_12.py 1.12.0 (SPEC_V1_12.md), with

@@ -21,6 +21,8 @@ consumers. It does not rewrite them.
 - It is the **glue** — a web dashboard that surfaces all of them.
 
 ## Architecture
+- **2.0.0 (built 2026-11-20, 2.0.0-dev, not frozen; branch `consolidate-2.0.0`):** `boot_v2.py` + `legacy_v2.py` + `static/projection_v2.html` (SPEC_V2.md; CONSOLIDATION_V2.md). 1.12.0's fourteen-layer chain flattened into one module, one handler, one boot: the same behaviour, route by route (SPEC_V2 §1 names the 1.12.0 layer each route comes from). Run `python boot_v2.py`. Tests: `test_legacy_v2.py` plus the carried `test_*_at_v2.py` suites (aliases of the old module names; never add new behaviour to a consolidation, it is a new version).
+- Everything below is 1.12.0 and earlier, byte-identical in `archive/1.12.0/` (pytest.ini never collects it) and at the tag `v1.12.0`. The archived files import siblings via `../`, so run them from a worktree of the tag, not from the archive.
 - `boot_v1_12.py` + `legacy_v1_12.py` (SPEC_V1_12.md: the "Ask the AI" card; /api/ai/* relayed to ai-gate's local API, POSTs behind the v4 guard, no seal relay; the Legacy never calls a model; frozen 1.12.0, 2026-11-20). Run `python boot_v1_12.py` (with GEMINI_API_KEY and FORGE_GEMINI_MODEL set for asks).
 - `boot_v1_11.py` + `legacy_v1_11.py` (SPEC_V1_11.md: drafts through Cockpit v1.8, listed and committed in the order written; page projection_v1_11.html; frozen 1.11.0; files named for their version, roadmap NAMING.md). Run `python boot_v1_11.py`.
 - `boot_v7.py` + `legacy_v12.py` (SPEC_V14.md: New entity / subject / claim tabs with drop-downs; drafts for Cockpit 1.7.0; frozen 1.10.0). Run `python boot_v7.py`.
