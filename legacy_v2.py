@@ -48,7 +48,7 @@ Depends:  explorer-d334-forge (Cockpit forge_cli_v1_1, v1_2, v1_3, v1_8, each wh
           the-weaver weaver_v1_4, lllm lllm_v0_1_2, the-echo echo_v1_1, sc-os nerves,
           substrate-layer substrate_v4, ai-gate ai_gate_serve.py (its HTTP API only)
 Spec:     SPEC_V2.md 2.0.0
-Version:  2.0.0-dev
+Version:  2.0.0 (frozen 2026-11-20)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
 """

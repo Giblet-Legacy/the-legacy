@@ -110,8 +110,8 @@ its comment. Nothing else changes. SPEC_V1_12 §2 describes it.
 ## 6. Tests
 
 - **test_legacy_v2.py** is 1.12.0's suite (9 tests), pointed at
-  legacy_v2 and boot_v2. The version check is `2.0.0-dev` until the
-  freeze.
+  legacy_v2 and boot_v2. Its version check is the frozen header
+  (`2.0.0 (frozen 2026-11-20)`).
 - **The twelve test_\*_at_v2.py suites** hold the 46 older tests that
   still describe 1.12.0 (CONSOLIDATION_V2 §8):
   - the old module names are imported as aliases of legacy_v2 or boot_v2;
@@ -133,4 +133,4 @@ its comment. Nothing else changes. SPEC_V1_12 §2 describes it.
 ## Document control
 
 - **SPEC V2 2.0.0**: 2026-11-20, by the VS Code AI on James's "go
-  ahead" (CONSOLIDATION_V2.md). Not frozen.
+  ahead" (CONSOLIDATION_V2.md). Frozen 2026-11-20 (James: "freeze").

@@ -18,7 +18,7 @@ Functions in this file (pytest-collected):
     5. test_inbox_still_works
     6. test_page_has_the_ai_card
     7. test_boot_v2_starts_field_gate_legacy
-    8. test_marked_2_0_0
+    8. test_frozen_at_2_0_0
 
 Helpers:
     9. gate (stub ai-gate), server, _get, _post
@@ -226,7 +226,7 @@ def test_boot_v2_starts_field_gate_legacy(monkeypatch):
 
 
 # 8
-def test_marked_2_0_0():
+def test_frozen_at_2_0_0():
     for name in ("legacy_v2.py", "boot_v2.py"):
         with open(os.path.join(ROOT, name), encoding="utf-8") as f:
-            assert "Version:  2.0.0-dev" in f.read(), name
+            assert "Version:  2.0.0 (frozen 2026-11-20)" in f.read(), name

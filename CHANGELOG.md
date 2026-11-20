@@ -4,9 +4,13 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ## [Unreleased]
 
-### Built 2026-11-20, not frozen: 2.0.0, the consolidation of 1.12.0 (James: "go ahead")
+### Frozen 2026-11-20 (James: "freeze")
 
-On branch `consolidate-2.0.0`; main and the VPS stay on 1.12.0 until the freeze.
+- legacy_v2.py + boot_v2.py 2.0.0 (SPEC_V2.md), with static/projection_v2.html. VERSION 1.12.0 -> 2.0.0.
+  Merged from branch `consolidate-2.0.0` into main in one merge commit and tagged `v2.0.0`; reverting
+  that merge puts 1.12.0 back. The Legacy's names now say their version (roadmap NAMING.md).
+
+### Built 2026-11-20: 2.0.0, the consolidation of 1.12.0 (James: "go ahead")
 
 #### Good
 

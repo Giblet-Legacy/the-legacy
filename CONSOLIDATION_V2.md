@@ -8,10 +8,10 @@ Function:
     (2026-11-16: "consolidate what is if adding more its a new v"): one
     clean major version, identical behaviour, old layers archived
     byte-identical, nothing added and nothing fixed. Built on branch
-    consolidate-2.0.0 and through its gate (§9); waiting for James's
-    word to freeze (§4 step 8).
+    consolidate-2.0.0, through its gate (§9), and frozen on James's
+    "freeze" (2026-11-20): merged into main in one commit, tagged v2.0.0.
 
-Version:  plan, draft 3 (2026-11-20: built; the gate passed; waiting for the freeze)
+Version:  plan, done (2026-11-20: frozen 2.0.0, tag v2.0.0)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
 

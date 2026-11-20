@@ -13,7 +13,7 @@ Tier:     Tier 1 — Consumer (The Connector)
 Depends:  All consumers (Cockpit, Substrate, Weaver, SC-OS, Echo)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
-Status:   2.0.0-dev — the consolidation of 1.12.0 (CONSOLIDATION_V2.md,
+Status:   2.0.0 (frozen 2026-11-20) — the consolidation of 1.12.0 (CONSOLIDATION_V2.md,
           SPEC_V2.md): legacy_v2.py, boot_v2.py, static/projection_v2.html.
           1.12.0 and everything before it is byte-identical in
           archive/1.12.0/ and at the tag v1.12.0.
