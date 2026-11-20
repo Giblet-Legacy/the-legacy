@@ -10,7 +10,7 @@ Function:
     byte-identical, nothing added and nothing fixed. Planned, not
     started; waiting for James's sign-off on §6.
 
-Version:  plan, draft 1 (2026-11-20)
+Version:  plan, draft 2 (2026-11-20: decisions and Step 0)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
 
@@ -141,18 +141,79 @@ running them, not by guessing:
   `/srv/legacy/src/ai-gate` exists. Either way, asks are refused there
   (no key, view-only guard).
 
-## 6. Decisions for James
+## 6. Decisions (James, 2026-11-20: "yes to all 4 1 archive folder and no to s24")
 
-1. **Is "behaviour = what boot_v1_12 does" right?** The alternative,
-   keeping every old entry point's behaviour in v2, would rebuild the
-   pile.
-2. **Is the branch, merged at freeze, OK?** It's the only way to keep
-   the VPS running throughout.
-3. **Archive layout:** one `archive/1.12.0/` holding everything (simple,
-   and runnable as-is), or one folder per old version (closer to the
-   history, but it won't run as-is). The recommendation is the first.
-4. **The S24:** should 2.0.0 also be confirmed on the S24 before the
-   freeze?
+1. Behaviour is what boot_v1_12 does.
+2. The work is on branch `consolidate-2.0.0`, merged once at the freeze.
+3. One archive folder: `archive/1.12.0/`.
+4. No S24 run; the laptop is enough.
+
+## 8. Step 0 result (2026-11-20)
+
+**How it was run:**
+- The tag `v1.12.0` was made, and the work is on branch
+  `consolidate-2.0.0`.
+- A scratchpad pytest plugin swapped every old `make_server` for 1.12.0's,
+  every old `boot_vN.main` for `boot_v1_12.main`, and every old legacy
+  `main` for 1.12.0's. legacy_v10's `main` was left alone, because 1.12.0
+  runs through it.
+- No file in the repository changed.
+
+**What a pass or a fail meant:**
+- A passing test counts as live only if it actually goes through 1.12.0's
+  server or boot.
+- A test that only calls an old helper 1.12.0 no longer reaches, or starts
+  an old file in a subprocess, passes trivially. It was counted as
+  replaced.
+- Five failing tests mixed live and replaced checks. Their live checks
+  were split out and run alone against 1.12.0, and they pass.
+
+**The totals:** 75 old tests. **41 are live** and carried as they are, **5
+are mixed** (only the live checks are carried), and **29 are replaced**.
+test_legacy_v1_12's 9 tests become test_legacy_v2.py.
+
+### Live, carried as `<suite>_at_v2.py` (41)
+
+| Old suite | Tests |
+|---|---|
+| test_legacy | health_endpoint_returns_json, index_returns_html, post_returns_405, path_traversal_blocked, unknown_route_returns_404, weaver_endpoint_returns_json |
+| test_legacy_v2 | v2_head_health, v2_health_survives_missing_cryptography, v2_index_and_weaver_inherited, v2_post_returns_405, v2_main_rejects_bad_args |
+| test_legacy_v3 | health_runs_current_layers (v3.probe_layers is what /api/health calls), nerves_states (v3.get_nerves is what /api/nerves calls) |
+| test_legacy_v4 | read_routes, echo_route, inbox_write_and_commit, inbox_guards, voice |
+| test_legacy_v5 | claims_route, chain_route, v4_routes_inherited |
+| test_legacy_v6 | claims_have_every_face, chain_kind_filter |
+| test_legacy_v7 | voice_speaks_text_and_aspects |
+| test_legacy_v8 | backoff, supervisor_order_and_restarts (boot.py's, used by boot_v1_12), server_buffer (v8.buffered is in 1.12.0's chain) |
+| test_legacy_v10 | briefing_through_weaver_v1_4 |
+| test_legacy_v11 | field_url_unchanged_without_the_variable, field_url_public_path, field_url_bad_values_ignored (5 cases) |
+| test_legacy_v12 | inbox_lists_each_kind, nouns_empty_without_a_database, nouns_registered_and_drafted, page, post_drafts_of_each_kind, post_refusals |
+| test_legacy_v1_11 | inbox_in_the_order_posted, nouns_drafts_in_the_order_written, page, posts_and_refusals_as_v12 |
+
+### Mixed: only the live checks are carried (5)
+
+| Test | Carried | Replaced, and by what |
+|---|---|---|
+| v3 test_http | health has 15 layers; nerves unavailable; POST /api/health is 405 | the briefing via `legacy_v3._weaver` (v10's Weaver v1.4) |
+| v4 test_lllm_and_field_states | /api/field unreachable, then reachable | "LLLM unavailable" with no LLLM_HOME (v7's /api/lllm) |
+| v6 test_older_routes_inherited | health has 15 layers; cockpit total | the Voice reply's wording (v7's Voice) |
+| v7 test_briefing_and_lllm_with_engine | /api/lllm build; /api/cockpit total | the briefing's LLLM line (v10) |
+| v7 test_page_and_inherited_routes | /api/claims; /api/chain?kind=claim | projection_v7.html (the 1.12 page) |
+
+### Replaced, left in the archive (29)
+
+| Why | Tests |
+|---|---|
+| Old helpers that 1.12.0 no longer reaches | legacy: probe_layers ×4, get_briefing ×3; v2: v1_raises_without_cryptography, v2_captures_missing_cryptography, v2_probe_layers_matches_v1, get_briefing_is_v1; v3: weaver_finds_real_claims; v4: briefing_from_any_directory (v4._weaver, in a subprocess) |
+| Old pages | v4, v5, v6, v9 page tests, v10 test_page, v8 test_page (reads projection_v8.html), v9 phone_tables (projection_v9 in a browser) |
+| Old briefing format | v7 briefing_without_engine (v10 replaced it) |
+| Old boots (two services; 1.12.0 starts three) | boot_v2, boot_v5, v9 boot_v3_order, v10 boot_v4_order, v11 boot_v6_order_and_env, v12 boot_v7_order, v1_11 boot_v1_11_order. test_legacy_v1_12's boot test covers boot_v1_12. |
+| Old boot.py started in a subprocess | v8 boot_end_to_end |
+
+**One gap to note:** v8's boot_end_to_end is the only test that boots
+the real processes, and it boots 1.4.0's `boot.py`. 1.12.0 has no
+end-to-end test. Nothing is added in a consolidation, so the §3.3
+side-by-side run stands in for it. A boot_v2 end-to-end test can come
+afterwards, as 2.1.0.
 
 ## 7. Left out on purpose
 
