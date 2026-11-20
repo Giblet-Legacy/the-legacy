@@ -21,7 +21,7 @@ consumers. It does not rewrite them.
 - It is the **glue** — a web dashboard that surfaces all of them.
 
 ## Architecture
-- `boot_v1_12.py` + `legacy_v1_12.py` (SPEC_V1_12.md: the "Ask the AI" card; /api/ai/* relayed to ai-gate's local API, POSTs behind the v4 guard, no seal relay; the Legacy never calls a model; built 2026-11-19, 1.12.0-dev, not frozen). Run `python boot_v1_12.py` (with GEMINI_API_KEY and FORGE_GEMINI_MODEL set for asks).
+- `boot_v1_12.py` + `legacy_v1_12.py` (SPEC_V1_12.md: the "Ask the AI" card; /api/ai/* relayed to ai-gate's local API, POSTs behind the v4 guard, no seal relay; the Legacy never calls a model; frozen 1.12.0, 2026-11-20). Run `python boot_v1_12.py` (with GEMINI_API_KEY and FORGE_GEMINI_MODEL set for asks).
 - `boot_v1_11.py` + `legacy_v1_11.py` (SPEC_V1_11.md: drafts through Cockpit v1.8, listed and committed in the order written; page projection_v1_11.html; frozen 1.11.0; files named for their version, roadmap NAMING.md). Run `python boot_v1_11.py`.
 - `boot_v7.py` + `legacy_v12.py` (SPEC_V14.md: New entity / subject / claim tabs with drop-downs; drafts for Cockpit 1.7.0; frozen 1.10.0). Run `python boot_v7.py`.
 - `boot_v6.py` + `legacy_v11.py` (SPEC_V13.md: one link — the page is told `FORGE_FIELD_PUBLIC_URL` for the Field, e.g. `/field/` on the VPS; frozen 1.9.0). Run `python boot_v6.py`.

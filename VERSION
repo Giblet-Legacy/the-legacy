@@ -28,6 +28,6 @@
 # 1.10.0 — legacy_v12.py + boot_v7.py frozen (SPEC_V14.md: New entity / subject / claim tabs with drop-downs, drafts for Cockpit 1.7.0). 73/74 on the laptop; the one failure is Q18's race, which passes alone.
 
 # 1.11.0 — legacy_v1_11.py + boot_v1_11.py frozen 2026-11-18 (James: "freeze") (SPEC_V1_11.md: drafts through Cockpit 1.8.0, in the order written). 78/79; the one failure is Q18's race, which passes alone.
-# 1.12.0 — built 2026-11-19, not frozen: legacy_v1_12.py + boot_v1_12.py (SPEC_V1_12.md: the AI on the page through ai-gate). Both marked 1.12.0-dev.
+# 1.12.0 — legacy_v1_12.py + boot_v1_12.py frozen 2026-11-20 (James: "freeze then plan 2.0.0 consolidation") (SPEC_V1_12.md: the AI on the page through ai-gate; Claims merged into Ask; six views).
 
-1.11.0
+1.12.0

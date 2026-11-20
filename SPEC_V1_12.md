@@ -136,11 +136,12 @@ and only the gate uses them.
 - The page has the card.
 - boot_v1_12 starts the field, then ai-gate, then the legacy, with the
   gate's URL.
-- Both files are marked 1.12.0-dev until frozen.
+- Both files say 1.12.0 (frozen 2026-11-20); they said 1.12.0-dev until then.
 
 ---
 
 ## Document control
 
 - **SPEC V1.12 1.12.0** — 2026-11-19, by the VS Code AI on James's
-  instruction. Not frozen.
+  instruction. Frozen 2026-11-20 (James: "freeze then plan 2.0.0
+  consolidation").

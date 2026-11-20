@@ -4,7 +4,20 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ## [Unreleased]
 
-### Built 2026-11-19, not frozen (James: "now lets integrate the ai into our interface")
+### Frozen 2026-11-20 (James: "freeze then plan 2.0.0 consolidation")
+
+- legacy_v1_12.py + boot_v1_12.py 1.12.0 (SPEC_V1_12.md), with
+  static/projection_v1_12.html. VERSION 1.11.0 -> 1.12.0. The names already say
+  the version (roadmap NAMING.md): `_v1_12` is 1.12.0, as the Cockpit's
+  `forge_cli_v1_8` is 1.8.0.
+- test_unfrozen_is_marked_dev became test_frozen_at_1_12_0.
+- Bad: frozen before James has seen a real Gemini answer through the page; the
+  relay is tested against a stub gate and smoke-tested without a key.
+- Bad: it depends on ai-gate 0.1.0, which is still 0.1.0-dev. The relay pins
+  only the gate's HTTP paths (/api/<allowed>), so ai-gate can freeze later.
+- Next: the 2.0.0 consolidation (CONSOLIDATION_V2.md, planned, not started).
+
+### Built 2026-11-19 (James: "now lets integrate the ai into our interface")
 
 - legacy_v1_12.py + boot_v1_12.py + static/projection_v1_12.html (SPEC_V1_12.md,
   1.12.0-dev): an "Ask the AI" card.

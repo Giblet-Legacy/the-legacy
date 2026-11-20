@@ -27,7 +27,7 @@ Internal helpers:
 Tier:     Tier 1 — Consumer (The Connector)
 Depends:  legacy_v1_11.py (1.11.0), ai-gate ai_gate_serve.py (0.1.0)
 Spec:     SPEC_V1_12.md 1.12.0
-Version:  1.12.0-dev
+Version:  1.12.0 (frozen 2026-11-20)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
 """

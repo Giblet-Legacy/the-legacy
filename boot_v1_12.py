@@ -20,7 +20,7 @@ Public API:
 Tier:     Tier 1 — Consumer (The Connector)
 Depends:  boot.py (SPEC_V8.md), legacy_v1_12.py, ../scp-substrate/serve_v8.py, ../ai-gate/ai_gate_serve.py
 Spec:     SPEC_V1_12.md 1.12.0
-Version:  1.12.0-dev
+Version:  1.12.0 (frozen 2026-11-20)
 Licence:  MSL-1.0
 Author:   James Gilbert (Giblets Forge)
 """
