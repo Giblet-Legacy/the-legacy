@@ -32,4 +32,6 @@
 
 # 2.0.0 — legacy_v2.py + boot_v2.py frozen 2026-11-20 (James: "freeze") (SPEC_V2.md: the consolidation of 1.12.0, CONSOLIDATION_V2.md; 1.12.0 byte-identical in archive/1.12.0/ and at tag v1.12.0). 59/59; side by side 51/51.
 
-2.0.0
+# 2.1.0 — legacy_v2_1.py + boot_v2_1.py frozen 2026-11-22 (SPEC_V2_1.md: first-time guidance and Advanced navigation).
+
+2.1.0

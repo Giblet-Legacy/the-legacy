@@ -4,6 +4,17 @@ CHANGELOG.md — build history for The Legacy, latest entry at top.
 
 ## [Unreleased]
 
+### Frozen 2026-11-22 (James: "freeze commit and push")
+
+- 2.1.0: `legacy_v2_1.py`, `boot_v2_1.py`,
+  `static/projection_v2_1.html` and `SPEC_V2_1.md`. VERSION 2.0.0 -> 2.1.0.
+- Plain-English guidance for new users; Ledger and System under Advanced,
+  with claims and faces still available in Ask. The 2.0.0 routes, write
+  guard and frozen files are preserved.
+- 63/63 tests passed on the laptop at freeze. Desktop and mobile
+  navigation, deep links and the Ledger keyboard shortcut checked in a
+  browser. Not checked on the S24 or VPS; no real Gemini request made.
+
 ### Frozen 2026-11-20 (James: "freeze")
 
 - legacy_v2.py + boot_v2.py 2.0.0 (SPEC_V2.md), with static/projection_v2.html. VERSION 1.12.0 -> 2.0.0.
